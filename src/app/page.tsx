@@ -15,20 +15,26 @@ const projects: Project[] = [
   { id: 'journaling', name: 'Journaling', slug: 'journaling', color: '#8b5cf6', is_active: true, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
 ];
 
-// Mock data for demonstration
-const mockTasks: Task[] = [
-  {
-    id: '1',
-    project_id: 'personal',
-    title: 'Complete workout routine',
-    status: 'todo',
-    priority: 'not_urgent_important',
-    is_urgent: false,
-    is_important: true,
-    owner: 'You',
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
+// Personal tasks from CSV
+const personalTasks: Task[] = [
+  { id: 'p1', project_id: 'personal', title: 'PnL sheet', status: 'todo', priority: 'urgent_important', is_urgent: true, is_important: true, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  { id: 'p2', project_id: 'personal', title: 'Workout routine', status: 'todo', priority: 'not_urgent_important', is_urgent: false, is_important: true, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  { id: 'p3', project_id: 'personal', title: 'Company closure', status: 'todo', priority: 'urgent_important', is_urgent: true, is_important: true, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  { id: 'p4', project_id: 'personal', title: 'Legal notice to builder indiabulls', status: 'todo', priority: 'urgent_important', is_urgent: true, is_important: true, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  { id: 'p5', project_id: 'personal', title: 'Sell laptop', status: 'todo', priority: 'not_urgent_not_important', is_urgent: false, is_important: false, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  { id: 'p6', project_id: 'personal', title: 'Increase card limit SBI', status: 'todo', priority: 'urgent_not_important', is_urgent: true, is_important: false, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  { id: 'p7', project_id: 'personal', title: 'Hard disk repair', status: 'todo', priority: 'urgent_not_important', is_urgent: true, is_important: false, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  { id: 'p8', project_id: 'personal', title: 'BMI tracking', status: 'todo', priority: 'not_urgent_important', is_urgent: false, is_important: true, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  { id: 'p9', project_id: 'personal', title: 'Proprietorship account', status: 'todo', priority: 'urgent_important', is_urgent: true, is_important: true, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  { id: 'p10', project_id: 'personal', title: 'Learn SEO and pSEO', status: 'todo', priority: 'not_urgent_important', is_urgent: false, is_important: true, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  { id: 'p11', project_id: 'personal', title: 'Penal charges and bounce charges CBI loan', status: 'todo', priority: 'urgent_important', is_urgent: true, is_important: true, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  { id: 'p12', project_id: 'personal', title: 'CBI loan analysis', status: 'todo', priority: 'urgent_important', is_urgent: true, is_important: true, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  { id: 'p13', project_id: 'personal', title: 'IndusInd card application', status: 'todo', priority: 'not_urgent_not_important', is_urgent: false, is_important: false, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  { id: 'p14', project_id: 'personal', title: 'ICICI card limit increase', status: 'todo', priority: 'urgent_not_important', is_urgent: true, is_important: false, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+];
+
+// Mock data for other projects
+const otherTasks: Task[] = [
   {
     id: '2', 
     project_id: 'bmn',
@@ -54,17 +60,6 @@ const mockTasks: Task[] = [
     updated_at: new Date().toISOString(),
   },
   {
-    id: '4',
-    project_id: 'personal',
-    title: 'Check social media',
-    status: 'todo',
-    priority: 'not_urgent_not_important',
-    is_urgent: false,
-    is_important: false,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-  {
     id: '5',
     project_id: 'health',
     title: 'Schedule annual checkup',
@@ -72,7 +67,6 @@ const mockTasks: Task[] = [
     priority: 'not_urgent_important',
     is_urgent: false,
     is_important: true,
-    owner: 'You',
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
   },
@@ -84,7 +78,6 @@ const mockTasks: Task[] = [
     priority: 'urgent_not_important',
     is_urgent: true,
     is_important: false,
-    owner: 'You',
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
   },
@@ -96,7 +89,6 @@ const mockTasks: Task[] = [
     priority: 'not_urgent_important',
     is_urgent: false,
     is_important: true,
-    owner: 'You',
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
   },
@@ -108,11 +100,12 @@ const mockTasks: Task[] = [
     priority: 'not_urgent_important',
     is_urgent: false,
     is_important: true,
-    owner: 'You',
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
   },
 ];
+
+const mockTasks: Task[] = [...personalTasks, ...otherTasks];
 
 type ViewMode = 'matrix' | 'table';
 
@@ -269,6 +262,7 @@ export default function Home() {
             <TaskTable 
               tasks={filteredTasks}
               onTaskClick={handleTaskClick}
+              projectId={activeProject}
             />
           )}
         </div>

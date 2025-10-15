@@ -7,6 +7,7 @@ import { CalendarIcon, UserIcon, LinkIcon } from '@heroicons/react/24/outline';
 interface TaskTableProps {
   tasks: Task[];
   onTaskClick: (task: Task) => void;
+  projectId?: string;
 }
 
 const priorityConfig = {
@@ -16,7 +17,8 @@ const priorityConfig = {
   not_urgent_not_important: { label: 'Eliminate', color: 'bg-blue-100 text-blue-800', icon: '🗑️' },
 };
 
-const TaskTable: React.FC<TaskTableProps> = ({ tasks, onTaskClick }) => {
+const TaskTable: React.FC<TaskTableProps> = ({ tasks, onTaskClick, projectId }) => {
+  const isPersonalProject = projectId === 'personal';
   if (tasks.length === 0) {
     return (
       <div className="bg-white rounded-lg shadow-sm border border-gray-200">
@@ -44,9 +46,11 @@ const TaskTable: React.FC<TaskTableProps> = ({ tasks, onTaskClick }) => {
               <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Priority
               </th>
-              <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                Owner
-              </th>
+              {!isPersonalProject && (
+                <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                  Owner
+                </th>
+              )}
               <th scope="col" className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                 Due Date
               </th>
@@ -100,15 +104,17 @@ const TaskTable: React.FC<TaskTableProps> = ({ tasks, onTaskClick }) => {
                     </span>
                   </td>
                   
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                    {task.owner && (
-                      <div className="flex items-center">
-                        <UserIcon className="w-4 h-4 mr-1 text-gray-400" />
-                        {task.owner}
-                      </div>
-                    )}
-                    {!task.owner && <span className="text-gray-400">-</span>}
-                  </td>
+                  {!isPersonalProject && (
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                      {task.owner && (
+                        <div className="flex items-center">
+                          <UserIcon className="w-4 h-4 mr-1 text-gray-400" />
+                          {task.owner}
+                        </div>
+                      )}
+                      {!task.owner && <span className="text-gray-400">-</span>}
+                    </td>
+                  )}
                   
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                     {task.due_date && (
