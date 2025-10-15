@@ -66,7 +66,7 @@ export interface CSVImportLog {
   successful_imports: number;
   failed_imports: number;
   import_date: string;
-  import_summary: Record<string, any>;
+  import_summary: Record<string, unknown>;
 }
 
 // Helper functions for priority mapping
