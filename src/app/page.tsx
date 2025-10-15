@@ -2,7 +2,9 @@
 
 import React, { useState } from 'react';
 import EisenhowerMatrix from '@/components/EisenhowerMatrix';
+import TaskTable from '@/components/TaskTable';
 import { Task, TaskPriority, Project, getFlagsFromPriority } from '@/types/task';
+import { Squares2X2Icon, TableCellsIcon } from '@heroicons/react/24/outline';
 
 // Project definitions
 const projects: Project[] = [
@@ -112,10 +114,13 @@ const mockTasks: Task[] = [
   },
 ];
 
+type ViewMode = 'matrix' | 'table';
+
 export default function Home() {
   const [tasks, setTasks] = useState<Task[]>(mockTasks);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [activeProject, setActiveProject] = useState<string>('personal');
+  const [viewMode, setViewMode] = useState<ViewMode>('matrix');
 
   const handleTaskMove = (taskId: string, newPriority: TaskPriority) => {
     setTasks(prevTasks => 
@@ -205,23 +210,67 @@ export default function Home() {
       {/* Main Content */}
       <main className="max-w-7xl mx-auto">
         <div className="p-4">
-          <div className="mb-4">
-            <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-3">
-              <div 
-                className="w-4 h-4 rounded-full" 
-                style={{ backgroundColor: currentProject?.color }}
-              ></div>
-              {currentProject?.name} Tasks
-            </h2>
-            <p className="text-gray-600 mt-1">
-              {filteredTasks.length} task{filteredTasks.length !== 1 ? 's' : ''} in this project
-            </p>
+          <div className="mb-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-3">
+                  <div 
+                    className="w-4 h-4 rounded-full" 
+                    style={{ backgroundColor: currentProject?.color }}
+                  ></div>
+                  {currentProject?.name} Tasks
+                </h2>
+                <p className="text-gray-600 mt-1">
+                  {filteredTasks.length} task{filteredTasks.length !== 1 ? 's' : ''} in this project
+                </p>
+              </div>
+              
+              {/* View Toggle */}
+              <div className="flex items-center bg-gray-100 rounded-lg p-1">
+                <button
+                  onClick={() => setViewMode('matrix')}
+                  className={`
+                    flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors
+                    ${
+                      viewMode === 'matrix'
+                        ? 'bg-white text-gray-900 shadow-sm'
+                        : 'text-gray-600 hover:text-gray-900'
+                    }
+                  `}
+                >
+                  <Squares2X2Icon className="w-4 h-4" />
+                  Matrix
+                </button>
+                <button
+                  onClick={() => setViewMode('table')}
+                  className={`
+                    flex items-center gap-2 px-3 py-2 rounded-md text-sm font-medium transition-colors
+                    ${
+                      viewMode === 'table'
+                        ? 'bg-white text-gray-900 shadow-sm'
+                        : 'text-gray-600 hover:text-gray-900'
+                    }
+                  `}
+                >
+                  <TableCellsIcon className="w-4 h-4" />
+                  Table
+                </button>
+              </div>
+            </div>
           </div>
-          <EisenhowerMatrix 
-            tasks={filteredTasks}
-            onTaskMove={handleTaskMove}
-            onTaskClick={handleTaskClick}
-          />
+          {/* Content based on view mode */}
+          {viewMode === 'matrix' ? (
+            <EisenhowerMatrix 
+              tasks={filteredTasks}
+              onTaskMove={handleTaskMove}
+              onTaskClick={handleTaskClick}
+            />
+          ) : (
+            <TaskTable 
+              tasks={filteredTasks}
+              onTaskClick={handleTaskClick}
+            />
+          )}
         </div>
       </main>
 
