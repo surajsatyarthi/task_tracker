@@ -2,7 +2,16 @@
 
 import React, { useState } from 'react';
 import EisenhowerMatrix from '@/components/EisenhowerMatrix';
-import { Task, TaskPriority, getFlagsFromPriority } from '@/types/task';
+import { Task, TaskPriority, Project, getFlagsFromPriority } from '@/types/task';
+
+// Project definitions
+const projects: Project[] = [
+  { id: 'personal', name: 'Personal', slug: 'personal', color: '#6366f1', is_active: true, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  { id: 'bmn', name: 'BMN', slug: 'bmn', color: '#10b981', is_active: true, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  { id: 'csuite', name: 'CSuite', slug: 'csuite', color: '#dc2626', is_active: true, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  { id: 'health', name: 'Health', slug: 'health', color: '#f59e0b', is_active: true, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  { id: 'journaling', name: 'Journaling', slug: 'journaling', color: '#8b5cf6', is_active: true, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+];
 
 // Mock data for demonstration
 const mockTasks: Task[] = [
@@ -53,11 +62,60 @@ const mockTasks: Task[] = [
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
   },
+  {
+    id: '5',
+    project_id: 'health',
+    title: 'Schedule annual checkup',
+    status: 'todo',
+    priority: 'not_urgent_important',
+    is_urgent: false,
+    is_important: true,
+    owner: 'You',
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  },
+  {
+    id: '6',
+    project_id: 'health',
+    title: 'Take vitamins',
+    status: 'doing',
+    priority: 'urgent_not_important',
+    is_urgent: true,
+    is_important: false,
+    owner: 'You',
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  },
+  {
+    id: '7',
+    project_id: 'journaling',
+    title: 'Morning reflection',
+    status: 'done',
+    priority: 'not_urgent_important',
+    is_urgent: false,
+    is_important: true,
+    owner: 'You',
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  },
+  {
+    id: '8',
+    project_id: 'journaling',
+    title: 'Weekly review',
+    status: 'todo',
+    priority: 'not_urgent_important',
+    is_urgent: false,
+    is_important: true,
+    owner: 'You',
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString(),
+  },
 ];
 
 export default function Home() {
   const [tasks, setTasks] = useState<Task[]>(mockTasks);
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+  const [activeProject, setActiveProject] = useState<string>('personal');
 
   const handleTaskMove = (taskId: string, newPriority: TaskPriority) => {
     setTasks(prevTasks => 
@@ -81,6 +139,9 @@ export default function Home() {
     setSelectedTask(task);
   };
 
+  const filteredTasks = tasks.filter(task => task.project_id === activeProject);
+  const currentProject = projects.find(p => p.id === activeProject);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-gray-100">
       {/* Header */}
@@ -96,9 +157,6 @@ export default function Home() {
               </p>
             </div>
             <div className="flex items-center gap-4">
-              <button className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors">
-                Import CSV
-              </button>
               <button className="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700 transition-colors">
                 Add Task
               </button>
@@ -107,13 +165,64 @@ export default function Home() {
         </div>
       </header>
 
+      {/* Project Navigation */}
+      <div className="bg-white border-b border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <nav className="flex space-x-8" aria-label="Projects">
+            {projects.map((project) => {
+              const isActive = activeProject === project.id;
+              return (
+                <button
+                  key={project.id}
+                  onClick={() => setActiveProject(project.id)}
+                  className={`
+                    whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm transition-colors
+                    ${
+                      isActive
+                        ? 'border-blue-500 text-blue-600'
+                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    }
+                  `}
+                  style={{
+                    ...(isActive && { borderBottomColor: project.color }),
+                    ...(isActive && { color: project.color })
+                  }}
+                >
+                  <span className="flex items-center gap-2">
+                    <div 
+                      className="w-3 h-3 rounded-full" 
+                      style={{ backgroundColor: project.color }}
+                    ></div>
+                    {project.name}
+                  </span>
+                </button>
+              );
+            })}
+          </nav>
+        </div>
+      </div>
+
       {/* Main Content */}
       <main className="max-w-7xl mx-auto">
-        <EisenhowerMatrix 
-          tasks={tasks}
-          onTaskMove={handleTaskMove}
-          onTaskClick={handleTaskClick}
-        />
+        <div className="p-4">
+          <div className="mb-4">
+            <h2 className="text-2xl font-bold text-gray-900 flex items-center gap-3">
+              <div 
+                className="w-4 h-4 rounded-full" 
+                style={{ backgroundColor: currentProject?.color }}
+              ></div>
+              {currentProject?.name} Tasks
+            </h2>
+            <p className="text-gray-600 mt-1">
+              {filteredTasks.length} task{filteredTasks.length !== 1 ? 's' : ''} in this project
+            </p>
+          </div>
+          <EisenhowerMatrix 
+            tasks={filteredTasks}
+            onTaskMove={handleTaskMove}
+            onTaskClick={handleTaskClick}
+          />
+        </div>
       </main>
 
       {/* Task Detail Modal (placeholder) */}
