@@ -3,12 +3,13 @@
 import React, { useState } from 'react';
 import EisenhowerMatrix from '@/components/EisenhowerMatrix';
 import TaskTable from '@/components/TaskTable';
+import CalendarView from '@/components/CalendarView';
 import TaskDetailModal from '@/components/TaskDetailModal';
 import AddTaskModal from '@/components/AddTaskModal';
 import HealthDashboard from '@/components/HealthDashboard';
 import JournalDashboard from '@/components/JournalDashboard';
 import { Task, TaskPriority, Project, getFlagsFromPriority } from '@/types/task';
-import { Squares2X2Icon, TableCellsIcon } from '@heroicons/react/24/outline';
+import { Squares2X2Icon, TableCellsIcon, CalendarIcon, ArchiveBoxIcon } from '@heroicons/react/24/outline';
 
 // Project definitions
 const projects: Project[] = [
@@ -61,7 +62,7 @@ const otherTasks: Task[] = [
 
 const mockTasks: Task[] = [...personalTasks, ...otherTasks];
 
-type ViewMode = 'matrix' | 'table' | 'workout';
+type ViewMode = 'matrix' | 'table' | 'calendar' | 'workout';
 
 export default function Home() {
   const [tasks, setTasks] = useState<Task[]>(mockTasks);
@@ -69,6 +70,7 @@ export default function Home() {
   const [activeProject, setActiveProject] = useState<string>('personal');
   const [viewMode, setViewMode] = useState<ViewMode>('matrix');
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [showArchived, setShowArchived] = useState(false);
 
   const handleProjectChange = (projectId: string) => {
     setActiveProject(projectId);
@@ -133,7 +135,16 @@ export default function Home() {
     setTasks(prevTasks => [...prevTasks, newTask]);
   };
 
-  const filteredTasks = tasks.filter(task => task.project_id === activeProject);
+  // Filter tasks by project and archive status
+  const filteredTasks = tasks.filter(task => {
+    if (task.project_id !== activeProject) return false;
+    
+    // If showing archived, only show done tasks
+    if (showArchived) return task.status === 'done';
+    
+    // If not showing archived, hide done tasks
+    return task.status !== 'done';
+  });
   const currentProject = projects.find(p => p.id === activeProject);
 
   return (
@@ -222,42 +233,79 @@ export default function Home() {
                     ? 'Your comprehensive fitness tracking system' 
                     : activeProject === 'journaling'
                     ? 'Your mental wellbeing companion'
-                    : `${filteredTasks.length} task${filteredTasks.length !== 1 ? 's' : ''} in this project`
+                    : showArchived
+                    ? `${filteredTasks.length} completed task${filteredTasks.length !== 1 ? 's' : ''} archived`
+                    : `${filteredTasks.length} active task${filteredTasks.length !== 1 ? 's' : ''} in this project`
                   }
                 </p>
               </div>
               
-              {/* View Toggle - Hide for Health and Journaling projects */}
+              {/* View Toggle and Archive Toggle - Hide for Health and Journaling projects */}
               {activeProject !== 'health' && activeProject !== 'journaling' && (
-                <div className="flex items-center bg-gray-100 rounded-lg p-1">
+                <div className="flex items-center gap-3">
+                  {/* Archive Toggle */}
                   <button
-                    onClick={() => setViewMode('matrix')}
-                    className={`
-                      flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-2 rounded-md text-xs sm:text-sm font-medium transition-colors
-                      ${
-                        viewMode === 'matrix'
-                          ? 'bg-white text-gray-900 shadow-sm'
-                          : 'text-gray-600 hover:text-gray-900'
-                      }
-                    `}
+                    onClick={() => setShowArchived(!showArchived)}
+                    className={`flex items-center gap-2 px-3 py-2 rounded-md text-xs sm:text-sm font-medium transition-colors ${
+                      showArchived
+                        ? 'bg-green-100 text-green-800 hover:bg-green-200'
+                        : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
+                    }`}
                   >
-                    <Squares2X2Icon className="w-4 h-4" />
-                    <span className="hidden sm:inline">Matrix</span>
+                    <ArchiveBoxIcon className="w-4 h-4" />
+                    <span className="hidden sm:inline">
+                      {showArchived ? 'Show Active' : 'Show Archived'}
+                    </span>
+                    <span className="sm:hidden">
+                      {showArchived ? 'Active' : 'Archive'}
+                    </span>
                   </button>
-                  <button
-                    onClick={() => setViewMode('table')}
-                    className={`
-                      flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-2 rounded-md text-xs sm:text-sm font-medium transition-colors
-                      ${
-                        viewMode === 'table'
-                          ? 'bg-white text-gray-900 shadow-sm'
-                          : 'text-gray-600 hover:text-gray-900'
-                      }
-                    `}
-                  >
-                    <TableCellsIcon className="w-4 h-4" />
-                    <span className="hidden sm:inline">Table</span>
-                  </button>
+                  
+                  {/* View Mode Toggle */}
+                  <div className="flex items-center bg-gray-100 rounded-lg p-1">
+                    <button
+                      onClick={() => setViewMode('matrix')}
+                      className={`
+                        flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-2 rounded-md text-xs sm:text-sm font-medium transition-colors
+                        ${
+                          viewMode === 'matrix'
+                            ? 'bg-white text-gray-900 shadow-sm'
+                            : 'text-gray-600 hover:text-gray-900'
+                        }
+                      `}
+                    >
+                      <Squares2X2Icon className="w-4 h-4" />
+                      <span className="hidden sm:inline">Matrix</span>
+                    </button>
+                    <button
+                      onClick={() => setViewMode('table')}
+                      className={`
+                        flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-2 rounded-md text-xs sm:text-sm font-medium transition-colors
+                        ${
+                          viewMode === 'table'
+                            ? 'bg-white text-gray-900 shadow-sm'
+                            : 'text-gray-600 hover:text-gray-900'
+                        }
+                      `}
+                    >
+                      <TableCellsIcon className="w-4 h-4" />
+                      <span className="hidden sm:inline">Table</span>
+                    </button>
+                    <button
+                      onClick={() => setViewMode('calendar')}
+                      className={`
+                        flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-2 rounded-md text-xs sm:text-sm font-medium transition-colors
+                        ${
+                          viewMode === 'calendar'
+                            ? 'bg-white text-gray-900 shadow-sm'
+                            : 'text-gray-600 hover:text-gray-900'
+                        }
+                      `}
+                    >
+                      <CalendarIcon className="w-4 h-4" />
+                      <span className="hidden sm:inline">Calendar</span>
+                    </button>
+                  </div>
                 </div>
               )}
             </div>
@@ -273,12 +321,17 @@ export default function Home() {
               onTaskMove={handleTaskMove}
               onTaskClick={handleTaskClick}
             />
-          ) : (
+          ) : viewMode === 'table' ? (
             <TaskTable 
               tasks={filteredTasks}
               onTaskClick={handleTaskClick}
             />
-          )}
+          ) : viewMode === 'calendar' ? (
+            <CalendarView 
+              tasks={filteredTasks}
+              onTaskClick={handleTaskClick}
+            />
+          ) : null}
         </div>
       </main>
 
