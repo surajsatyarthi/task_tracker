@@ -51,6 +51,7 @@ const personalTasks: Task[] = [
   { id: 'p24', project_id: 'personal', title: 'Julian Goldie SEO Thread 1', description: 'https://x.com/JulianGoldieSEO/status/1976729630666375226', status: 'todo', priority: 'not_urgent_important', is_urgent: false, is_important: true, links: ['https://x.com/JulianGoldieSEO/status/1976729630666375226'], created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
   { id: 'p25', project_id: 'personal', title: 'Natia Kourdadze SEO Thread', description: 'https://x.com/natiakourdadze/status/1977064491528450346', status: 'todo', priority: 'not_urgent_important', is_urgent: false, is_important: true, links: ['https://x.com/natiakourdadze/status/1977064491528450346'], created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
   { id: 'p26', project_id: 'personal', title: 'Julian Goldie SEO Thread 2', description: 'https://x.com/JulianGoldieSEO/status/1977444094298476979', status: 'todo', priority: 'not_urgent_important', is_urgent: false, is_important: true, links: ['https://x.com/JulianGoldieSEO/status/1977444094298476979'], created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  { id: 'p27', project_id: 'personal', title: 'Watch Starter Story Build Program', description: 'Starter Story Build lesson on business development', status: 'todo', priority: 'not_urgent_important', is_urgent: false, is_important: true, links: ['https://build.starterstory.com/programs/173/lessons/123861'], created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
 ];
 
 // BMN tasks - Business and Marketing focused
@@ -81,6 +82,7 @@ const bmnTasks: Task[] = [
   { id: 'bmn17', project_id: 'bmn', title: 'YouTube Video 3', description: 'Educational content', status: 'todo', priority: 'not_urgent_not_important', is_urgent: false, is_important: false, links: ['https://www.youtube.com/watch?v=tu501rOVMGc'], created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
   { id: 'bmn18', project_id: 'bmn', title: 'YouTube Video 4', description: 'Business insights', status: 'todo', priority: 'not_urgent_not_important', is_urgent: false, is_important: false, links: ['https://www.youtube.com/watch?v=Kr6fWPEe7wM'], created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
   { id: 'bmn19', project_id: 'bmn', title: 'YouTube Short 2', description: 'Marketing tip', status: 'todo', priority: 'not_urgent_not_important', is_urgent: false, is_important: false, links: ['https://www.youtube.com/shorts/BHNPabuv3p8'], created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  { id: 'bmn20', project_id: 'bmn', title: 'Fix image loading issue', status: 'todo', priority: 'urgent_important', is_urgent: true, is_important: true, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
 ];
 
 // CSuite tasks - Executive and operational focus
