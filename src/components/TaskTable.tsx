@@ -1,8 +1,8 @@
 'use client';
 
 import React from 'react';
-import { Task, statusConfig, sortTasks } from '@/types/task';
-import { CalendarIcon, LinkIcon } from '@heroicons/react/24/outline';
+import { Task, statusConfig, sortTasks, isTaskOverdue, formatDateForDisplay, getDaysUntilDue } from '@/types/task';
+import { CalendarIcon, LinkIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline';
 
 interface TaskTableProps {
   tasks: Task[];
@@ -57,18 +57,28 @@ const TaskTable: React.FC<TaskTableProps> = ({ tasks, onTaskClick }) => {
             {sortedTasks.map((task) => {
               const statusStyle = statusConfig[task.status];
               const priorityStyle = priorityConfig[task.priority];
+              const isOverdue = isTaskOverdue(task);
               
               return (
                 <tr
                   key={task.id}
-                  className="hover:bg-gray-50 cursor-pointer transition-colors"
+                  className={`cursor-pointer transition-colors ${
+                    isOverdue 
+                      ? 'bg-red-50 hover:bg-red-100 border-l-4 border-l-red-500' 
+                      : 'hover:bg-gray-50'
+                  }`}
                   onClick={() => onTaskClick(task)}
                 >
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-start">
                       <div className="flex-1">
-                        <div className="text-sm font-medium text-gray-900 line-clamp-2">
-                          {task.title}
+                        <div className={`text-sm font-medium line-clamp-2 flex items-center gap-2 ${
+                          isOverdue ? 'text-red-800' : 'text-gray-900'
+                        }`}>
+                          {isOverdue && (
+                            <ExclamationTriangleIcon className="w-4 h-4 text-red-500 animate-pulse flex-shrink-0" />
+                          )}
+                          <span>{task.title}</span>
                         </div>
                         {task.description && (
                           <div className="text-sm text-gray-500 line-clamp-1 mt-1">
@@ -100,9 +110,23 @@ const TaskTable: React.FC<TaskTableProps> = ({ tasks, onTaskClick }) => {
                   
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
                     {task.due_date && (
-                      <div className="flex items-center">
+                      <div className={`flex items-center ${
+                        isOverdue ? 'text-red-600 font-medium' : ''
+                      }`}>
                         <CalendarIcon className="w-4 h-4 mr-1 text-gray-400" />
-                        {new Date(task.due_date).toLocaleDateString()}
+                        <div className="flex flex-col">
+                          <span>{formatDateForDisplay(task.due_date)}</span>
+                          {isOverdue && (
+                            <span className="text-xs text-red-600 font-bold">
+                              Overdue: {Math.abs(getDaysUntilDue(task.due_date))} days
+                            </span>
+                          )}
+                          {!isOverdue && (
+                            <span className="text-xs text-green-600">
+                              {getDaysUntilDue(task.due_date)} days left
+                            </span>
+                          )}
+                        </div>
                       </div>
                     )}
                     {!task.due_date && <span className="text-gray-400">-</span>}

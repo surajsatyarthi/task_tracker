@@ -1,8 +1,8 @@
 'use client';
 
 import React from 'react';
-import { Task, statusConfig } from '@/types/task';
-import { CalendarIcon, UserIcon, LinkIcon } from '@heroicons/react/24/outline';
+import { Task, statusConfig, isTaskOverdue, formatDateForDisplay, getDaysUntilDue } from '@/types/task';
+import { CalendarIcon, UserIcon, LinkIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline';
 
 interface TaskCardProps {
   task: Task;
@@ -12,18 +12,29 @@ interface TaskCardProps {
 
 const TaskCard: React.FC<TaskCardProps> = ({ task, isDragging = false, onClick }) => {
   const statusStyle = statusConfig[task.status];
+  const isOverdue = isTaskOverdue(task);
 
   return (
     <div
       className={`
-        bg-white rounded-lg border border-gray-200 p-4 cursor-pointer hover:shadow-lg transition-all duration-200
+        bg-white rounded-lg border p-4 cursor-pointer hover:shadow-lg transition-all duration-200 relative
         ${isDragging ? 'shadow-2xl border-blue-300' : 'hover:border-gray-300'}
+        ${isOverdue ? 'border-red-300 bg-red-50 shadow-red-100 shadow-md' : 'border-gray-200'}
       `}
       onClick={onClick}
     >
+      {/* Overdue Warning */}
+      {isOverdue && (
+        <div className="absolute -top-1 -right-1 bg-red-500 text-white p-1 rounded-full shadow-lg animate-pulse">
+          <ExclamationTriangleIcon className="w-4 h-4" />
+        </div>
+      )}
+      
       {/* Task Header */}
       <div className="flex justify-between items-start mb-3">
-        <h4 className="font-semibold text-gray-900 leading-tight line-clamp-2">
+        <h4 className={`font-semibold leading-tight line-clamp-2 ${
+          isOverdue ? 'text-red-800' : 'text-gray-900'
+        }`}>
           {task.title}
         </h4>
         <span className={`
@@ -59,9 +70,23 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, isDragging = false, onClick }
         )}
         
         {task.due_date && (
-          <div className="flex items-center gap-1">
+          <div className={`flex items-center gap-1 ${
+            isOverdue ? 'text-red-600 font-medium' : ''
+          }`}>
             <CalendarIcon className="w-3 h-3" />
-            <span>{new Date(task.due_date).toLocaleDateString()}</span>
+            <span>
+              {formatDateForDisplay(task.due_date)}
+              {isOverdue && (
+                <span className="ml-1 text-red-600 font-bold">
+                  (Overdue: {Math.abs(getDaysUntilDue(task.due_date))} days)
+                </span>
+              )}
+              {!isOverdue && task.due_date && (
+                <span className="ml-1 text-green-600">
+                  ({getDaysUntilDue(task.due_date)} days left)
+                </span>
+              )}
+            </span>
           </div>
         )}
         

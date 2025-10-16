@@ -143,6 +143,33 @@ export const sortTasksForMatrix = (tasks: Task[], priority: TaskPriority): Task[
   });
 };
 
+// Date utility functions
+export const getTodayDate = (): string => {
+  return new Date().toISOString().split('T')[0];
+};
+
+export const isTaskOverdue = (task: Task): boolean => {
+  if (!task.due_date || task.status === 'done') return false;
+  const today = getTodayDate();
+  return task.due_date < today;
+};
+
+export const formatDateForDisplay = (dateString: string): string => {
+  const date = new Date(dateString);
+  return date.toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric'
+  });
+};
+
+export const getDaysUntilDue = (dueDate: string): number => {
+  const today = new Date(getTodayDate());
+  const due = new Date(dueDate);
+  const diffTime = due.getTime() - today.getTime();
+  return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+};
+
 // CSV parsing helpers
 export const parseCSVStatus = (status: string): TaskStatus => {
   const normalizedStatus = status.toLowerCase().trim();
