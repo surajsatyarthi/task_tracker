@@ -85,32 +85,32 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ task, isOpen, onClose
         <div className="p-6 space-y-6">
           {/* Title */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Title</label>
+            <label className="block text-sm font-bold text-gray-900 mb-2">Title</label>
             {isEditing ? (
               <input
                 type="text"
                 value={editedTask.title || ''}
                 onChange={(e) => setEditedTask({ ...editedTask, title: e.target.value })}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
               />
             ) : (
-              <h3 className="text-lg font-medium text-gray-900">{currentTask.title}</h3>
+              <h3 className="text-lg font-semibold text-gray-900">{currentTask.title}</h3>
             )}
           </div>
 
           {/* Description */}
           {(currentTask.description || isEditing) && (
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Description</label>
+              <label className="block text-sm font-bold text-gray-900 mb-2">Description</label>
               {isEditing ? (
                 <textarea
                   value={editedTask.description || ''}
                   onChange={(e) => setEditedTask({ ...editedTask, description: e.target.value })}
                   rows={3}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
                 />
               ) : (
-                <p className="text-gray-600">{currentTask.description}</p>
+                <p className="text-gray-900 font-medium">{currentTask.description}</p>
               )}
             </div>
           )}
@@ -118,12 +118,12 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ task, isOpen, onClose
           {/* Status and Priority */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Status</label>
+              <label className="block text-sm font-bold text-gray-900 mb-2">Status</label>
               {isEditing ? (
                 <select
                   value={editedTask.status || task.status}
                   onChange={(e) => setEditedTask({ ...editedTask, status: e.target.value as TaskStatus })}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 font-medium"
                 >
                   {Object.entries(statusConfig).map(([status, config]) => (
                     <option key={status} value={status}>
@@ -132,7 +132,7 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ task, isOpen, onClose
                   ))}
                 </select>
               ) : (
-                <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${statusStyle.color}`}>
+                <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold ${statusStyle.color}`}>
                   <span className="mr-2">{statusStyle.icon}</span>
                   {statusStyle.label}
                 </span>
@@ -140,8 +140,8 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ task, isOpen, onClose
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Priority</label>
-              <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${priorityStyle.color}`}>
+              <label className="block text-sm font-bold text-gray-900 mb-2">Priority</label>
+              <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold ${priorityStyle.color}`}>
                 <span className="mr-2">{priorityStyle.icon}</span>
                 {priorityStyle.label}
               </span>
@@ -151,14 +151,14 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ task, isOpen, onClose
           {/* Quick Status Actions */}
           {!isEditing && (
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-3">Quick Actions</label>
+              <label className="block text-sm font-bold text-gray-900 mb-3">Quick Actions</label>
               <div className="flex flex-wrap gap-2">
                 {Object.entries(statusConfig).map(([status, config]) => (
                   <button
                     key={status}
                     onClick={() => handleStatusChange(status as TaskStatus)}
                     className={`
-                      px-3 py-1 rounded-md text-sm font-medium transition-colors
+                      px-3 py-1 rounded-md text-sm font-semibold transition-colors
                       ${task.status === status 
                         ? `${config.color} opacity-50 cursor-not-allowed` 
                         : `${config.color} hover:opacity-80 cursor-pointer`
@@ -177,7 +177,7 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ task, isOpen, onClose
           {/* Links */}
           {currentTask.links && currentTask.links.length > 0 && (
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Links</label>
+              <label className="block text-sm font-bold text-gray-900 mb-2">Links</label>
               <div className="space-y-2">
                 {currentTask.links.map((link, index) => (
                   <a
@@ -185,7 +185,7 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ task, isOpen, onClose
                     href={link}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center gap-2 text-blue-600 hover:text-blue-800 hover:underline break-all"
+                    className="flex items-center gap-2 text-blue-700 hover:text-blue-900 hover:underline break-all font-medium"
                   >
                     <LinkIcon className="w-4 h-4 flex-shrink-0" />
                     {link}
@@ -198,16 +198,16 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ task, isOpen, onClose
           {/* Remarks */}
           {(currentTask.remarks || isEditing) && (
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">Remarks</label>
+              <label className="block text-sm font-bold text-gray-900 mb-2">Remarks</label>
               {isEditing ? (
                 <textarea
                   value={editedTask.remarks || ''}
                   onChange={(e) => setEditedTask({ ...editedTask, remarks: e.target.value })}
                   rows={2}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900"
                 />
               ) : (
-                <p className="text-gray-600">{currentTask.remarks}</p>
+                <p className="text-gray-900 font-medium">{currentTask.remarks}</p>
               )}
             </div>
           )}
@@ -215,14 +215,14 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ task, isOpen, onClose
           {/* Metadata */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t border-gray-200">
             <div>
-              <label className="block text-sm font-medium text-gray-500">Created</label>
-              <p className="text-sm text-gray-900">
+              <label className="block text-sm font-bold text-gray-800">Created</label>
+              <p className="text-sm text-gray-900 font-medium">
                 {new Date(task.created_at).toLocaleString()}
               </p>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-500">Last Updated</label>
-              <p className="text-sm text-gray-900">
+              <label className="block text-sm font-bold text-gray-800">Last Updated</label>
+              <p className="text-sm text-gray-900 font-medium">
                 {new Date(task.updated_at).toLocaleString()}
               </p>
             </div>
