@@ -648,6 +648,29 @@ const HealthDashboard: React.FC<HealthDashboardProps> = ({ onWorkoutUpdate }) =>
             ) : weightView === 'table' ? (
               /* Enhanced Table View - Show all 30 days */
               <div className="space-y-4">
+                {/* Monthly Summary - At the top */}
+                <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                  <h4 className="font-semibold text-green-800 mb-2">🎉 October Progress Summary</h4>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                    <div>
+                      <span className="text-green-600 font-medium">Starting:</span>
+                      <div className="font-bold text-green-800">{dailyWeights[dailyWeights.length - 1].weight}kg</div>
+                    </div>
+                    <div>
+                      <span className="text-green-600 font-medium">Current:</span>
+                      <div className="font-bold text-green-800">{dailyWeights[0].weight}kg</div>
+                    </div>
+                    <div>
+                      <span className="text-green-600 font-medium">Days Tracked:</span>
+                      <div className="font-bold text-green-800">{dailyWeights.length}/30</div>
+                    </div>
+                    <div>
+                      <span className="text-green-600 font-medium">Consistency:</span>
+                      <div className="font-bold text-green-800">{Math.round((dailyWeights.length / 30) * 100)}%</div>
+                    </div>
+                  </div>
+                </div>
+                
                 {/* Week-by-week breakdown */}
                 {[
                   { week: 'Week 1 (Oct 1-7)', days: dailyWeights.slice(23, 30).reverse() },
@@ -708,29 +731,6 @@ const HealthDashboard: React.FC<HealthDashboardProps> = ({ onWorkoutUpdate }) =>
                   </div>
                 ))
                 }
-                
-                {/* Monthly Summary */}
-                <div className="bg-green-50 border border-green-200 rounded-lg p-4">
-                  <h4 className="font-semibold text-green-800 mb-2">🎉 October Progress Summary</h4>
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                    <div>
-                      <span className="text-green-600 font-medium">Starting:</span>
-                      <div className="font-bold text-green-800">{dailyWeights[dailyWeights.length - 1].weight}kg</div>
-                    </div>
-                    <div>
-                      <span className="text-green-600 font-medium">Current:</span>
-                      <div className="font-bold text-green-800">{dailyWeights[0].weight}kg</div>
-                    </div>
-                    <div>
-                      <span className="text-green-600 font-medium">Days Tracked:</span>
-                      <div className="font-bold text-green-800">{dailyWeights.length}/30</div>
-                    </div>
-                    <div>
-                      <span className="text-green-600 font-medium">Consistency:</span>
-                      <div className="font-bold text-green-800">{Math.round((dailyWeights.length / 30) * 100)}%</div>
-                    </div>
-                  </div>
-                </div>
               </div>
             ) : (
               /* Enhanced Graph View */
