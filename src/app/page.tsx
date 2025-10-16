@@ -233,32 +233,6 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-gray-100">
-      {/* Header */}
-      <header className="bg-white shadow-sm border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center py-4 sm:py-6 gap-4">
-            <div>
-              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">
-                Task Tracker
-              </h1>
-              <p className="text-gray-600 mt-1 text-sm sm:text-base">
-                Organize your tasks using the Eisenhower Matrix
-              </p>
-            </div>
-            <div className="flex items-center gap-2 sm:gap-4">
-              {/* Hide Add Task button for Health, Journaling, and LinkedIn projects */}
-              {activeProject !== 'health' && activeProject !== 'journaling' && activeProject !== 'linkedin' && (
-                <button 
-                  onClick={() => setIsAddModalOpen(true)}
-                  className="bg-green-600 text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-green-700 transition-colors text-sm sm:text-base"
-                >
-                  Add Task
-                </button>
-              )}
-            </div>
-          </div>
-        </div>
-      </header>
 
       {/* Project Navigation */}
       <div className="bg-white border-b border-gray-200">
@@ -329,6 +303,14 @@ export default function Home() {
               {/* View Toggle and Archive Toggle - Hide for Health, Journaling, and LinkedIn projects */}
               {activeProject !== 'health' && activeProject !== 'journaling' && activeProject !== 'linkedin' && (
                 <div className="flex items-center gap-3">
+                  {/* Add Task */}
+                  <button 
+                    onClick={() => setIsAddModalOpen(true)}
+                    className="bg-green-600 text-white px-3 py-2 rounded-md hover:bg-green-700 transition-colors text-xs sm:text-sm"
+                  >
+                    Add Task
+                  </button>
+
                   {/* Archive Toggle */}
                   <button
                     onClick={() => setShowArchived(!showArchived)}
