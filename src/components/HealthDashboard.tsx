@@ -61,16 +61,38 @@ const HealthDashboard: React.FC<HealthDashboardProps> = ({ onWorkoutUpdate }) =>
     setCurrentWorkout(todayWorkout || weeks[0]?.days[0] || null);
     setSelectedDate(todayWorkout?.date || new Date().toISOString().split('T')[0]);
 
-    // Load sample weight data for demonstration
+    // Load comprehensive sample weight data for October 2025
     setDailyWeights([
       { date: '2025-10-01', weight: 78.2, notes: 'Starting weight' },
+      { date: '2025-10-02', weight: 78.0, notes: 'Day 2 check-in' },
       { date: '2025-10-03', weight: 77.9, notes: 'Morning weight' },
+      { date: '2025-10-04', weight: 77.7, notes: 'Post workout Friday' },
       { date: '2025-10-05', weight: 77.6, notes: 'After workout' },
+      { date: '2025-10-06', weight: 77.8, notes: 'Sunday rest day' },
       { date: '2025-10-07', weight: 77.8, notes: 'Weekend weight' },
+      { date: '2025-10-08', weight: 77.5, notes: 'Back to routine' },
       { date: '2025-10-09', weight: 77.4, notes: 'Morning weight' },
+      { date: '2025-10-10', weight: 77.2, notes: 'Mid-week progress' },
       { date: '2025-10-11', weight: 77.1, notes: 'Post cardio' },
+      { date: '2025-10-12', weight: 77.0, notes: 'Consistency paying off' },
       { date: '2025-10-13', weight: 76.9, notes: 'Morning weight' },
+      { date: '2025-10-14', weight: 76.8, notes: 'Steady decline' },
       { date: '2025-10-15', weight: 76.6, notes: 'Great progress!' },
+      { date: '2025-10-16', weight: 76.5, notes: 'New personal low' },
+      { date: '2025-10-17', weight: 76.4, notes: 'Workout program start' },
+      { date: '2025-10-18', weight: 76.3, notes: 'Building momentum' },
+      { date: '2025-10-19', weight: 76.2, notes: 'Weekend consistency' },
+      { date: '2025-10-20', weight: 76.4, notes: 'Small fluctuation' },
+      { date: '2025-10-21', weight: 76.1, notes: 'Back on track' },
+      { date: '2025-10-22', weight: 76.0, notes: 'Breakthrough!' },
+      { date: '2025-10-23', weight: 75.9, notes: 'Almost at 75kg' },
+      { date: '2025-10-24', weight: 75.8, notes: 'Feeling strong' },
+      { date: '2025-10-25', weight: 75.7, notes: 'Consistent progress' },
+      { date: '2025-10-26', weight: 75.6, notes: 'Weekend maintenance' },
+      { date: '2025-10-27', weight: 75.5, notes: 'New milestone' },
+      { date: '2025-10-28', weight: 75.4, notes: 'End of month push' },
+      { date: '2025-10-29', weight: 75.3, notes: 'Almost there' },
+      { date: '2025-10-30', weight: 75.2, notes: 'October finale' },
     ]);
   }, []);
 
@@ -578,128 +600,264 @@ const HealthDashboard: React.FC<HealthDashboardProps> = ({ onWorkoutUpdate }) =>
 
           {/* Weight History */}
           <div className="bg-white rounded-xl p-6 border border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">
-              Weight History ({dailyWeights.length} records)
-            </h3>
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-gray-900">
+                Weight History - October 2025
+              </h3>
+              <div className="text-sm text-gray-600 bg-blue-50 px-3 py-1 rounded-full">
+                {dailyWeights.length} daily records
+              </div>
+            </div>
+            
+            {/* Weight Summary Stats */}
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6 p-4 bg-gradient-to-r from-blue-50 to-green-50 rounded-lg">
+              <div className="text-center">
+                <div className="text-xl font-bold text-green-600">
+                  {Math.max(...dailyWeights.map(w => w.weight))}kg
+                </div>
+                <div className="text-xs text-gray-600">Month High</div>
+                <div className="text-xs text-gray-500">Oct 1st</div>
+              </div>
+              <div className="text-center">
+                <div className="text-xl font-bold text-blue-600">
+                  {Math.min(...dailyWeights.map(w => w.weight))}kg
+                </div>
+                <div className="text-xs text-gray-600">Month Low</div>
+                <div className="text-xs text-gray-500">Oct 30th</div>
+              </div>
+              <div className="text-center">
+                <div className="text-xl font-bold text-purple-600">
+                  -{(Math.max(...dailyWeights.map(w => w.weight)) - Math.min(...dailyWeights.map(w => w.weight))).toFixed(1)}kg
+                </div>
+                <div className="text-xs text-gray-600">Total Loss</div>
+                <div className="text-xs text-gray-500">30 days</div>
+              </div>
+              <div className="text-center">
+                <div className="text-xl font-bold text-orange-600">
+                  -{((Math.max(...dailyWeights.map(w => w.weight)) - Math.min(...dailyWeights.map(w => w.weight))) / 30 * 7).toFixed(1)}kg
+                </div>
+                <div className="text-xs text-gray-600">Weekly Avg</div>
+                <div className="text-xs text-gray-500">rate</div>
+              </div>
+            </div>
             
             {dailyWeights.length === 0 ? (
               <div className="text-center py-8 text-gray-500">
                 No weight records yet. Start by recording your daily weight above.
               </div>
             ) : weightView === 'table' ? (
-              /* Table View - Compact */
-              <div className="overflow-hidden">
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                  {dailyWeights.slice(0, 12).map((weight) => (
-                    <div key={weight.date} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-100 hover:bg-gray-100 transition-colors">
-                      <div className="flex-1 min-w-0">
-                        <div className="font-medium text-gray-900 text-sm">
-                          {new Date(weight.date).toLocaleDateString('en-US', { 
-                            month: 'short', 
-                            day: 'numeric' 
-                          })}
-                        </div>
-                        {weight.notes && (
-                          <div className="text-xs text-gray-500 truncate">{weight.notes}</div>
+              /* Enhanced Table View - Show all 30 days */
+              <div className="space-y-4">
+                {/* Week-by-week breakdown */}
+                {[
+                  { week: 'Week 1 (Oct 1-7)', days: dailyWeights.slice(23, 30).reverse() },
+                  { week: 'Week 2 (Oct 8-14)', days: dailyWeights.slice(16, 23).reverse() },
+                  { week: 'Week 3 (Oct 15-21)', days: dailyWeights.slice(9, 16).reverse() },
+                  { week: 'Week 4 (Oct 22-28)', days: dailyWeights.slice(2, 9).reverse() },
+                  { week: 'Week 5 (Oct 29-30)', days: dailyWeights.slice(0, 2).reverse() },
+                ].map((weekData, weekIndex) => (
+                  <div key={weekIndex} className="border border-gray-200 rounded-lg">
+                    <div className="bg-gray-50 px-4 py-2 border-b border-gray-200">
+                      <h4 className="font-medium text-gray-900">{weekData.week}</h4>
+                      <div className="text-sm text-gray-600 mt-1">
+                        Loss: -{weekData.days.length > 1 ? (weekData.days[0].weight - weekData.days[weekData.days.length - 1].weight).toFixed(1) : '0.0'}kg
+                        {weekData.days.length > 1 && (
+                          <span className="ml-3">
+                            Avg: {(weekData.days.reduce((sum, d) => sum + d.weight, 0) / weekData.days.length).toFixed(1)}kg
+                          </span>
                         )}
                       </div>
-                      <div className="text-lg font-bold text-blue-600 ml-2">
-                        {weight.weight}kg
-                      </div>
                     </div>
-                  ))}
-                </div>
-                
-                {dailyWeights.length > 12 && (
-                  <div className="text-center mt-4">
-                    <span className="text-sm text-gray-500">
-                      Showing latest 12 entries of {dailyWeights.length} total
-                    </span>
-                  </div>
-                )}
-              </div>
-            ) : (
-              /* Graph View */
-              <div className="h-80">
-                <ResponsiveContainer width="100%" height="100%">
-                  <LineChart
-                    data={dailyWeights.map(weight => ({
-                      date: new Date(weight.date).toLocaleDateString('en-US', { 
-                        month: 'short', 
-                        day: 'numeric' 
-                      }),
-                      weight: weight.weight,
-                      fullDate: weight.date,
-                      notes: weight.notes
-                    }))}
-                    margin={{
-                      top: 5,
-                      right: 30,
-                      left: 20,
-                      bottom: 5,
-                    }}
-                  >
-                    <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
-                    <XAxis 
-                      dataKey="date" 
-                      tick={{ fontSize: 12 }}
-                      stroke="#666"
-                    />
-                    <YAxis 
-                      domain={['dataMin - 0.5', 'dataMax + 0.5']}
-                      tick={{ fontSize: 12 }}
-                      stroke="#666"
-                      label={{ value: 'Weight (kg)', angle: -90, position: 'insideLeft' }}
-                    />
-                    <Tooltip 
-                      content={({ active, payload, label }) => {
-                        if (active && payload && payload.length) {
-                          const data = payload[0].payload;
+                    <div className="p-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
+                        {weekData.days.map((weight) => {
+                          const dayNum = parseInt(weight.date.split('-')[2]);
+                          const isWeekend = new Date(weight.date).getDay() === 0 || new Date(weight.date).getDay() === 6;
+                          const isToday = weight.date === new Date().toISOString().split('T')[0];
+                          
                           return (
-                            <div className="bg-white p-3 border border-gray-200 rounded-lg shadow-lg">
-                              <p className="font-semibold text-gray-900">{label}</p>
-                              <p className="text-blue-600 font-bold">
-                                Weight: {data.weight}kg
-                              </p>
-                              {data.notes && (
-                                <p className="text-sm text-gray-600 mt-1">{data.notes}</p>
-                              )}
+                            <div key={weight.date} className={`flex items-center justify-between p-3 rounded-lg border transition-all hover:shadow-md ${
+                              isToday 
+                                ? 'bg-yellow-50 border-yellow-300 shadow-md' 
+                                : isWeekend 
+                                ? 'bg-blue-50 border-blue-200' 
+                                : 'bg-gray-50 border-gray-200 hover:bg-gray-100'
+                            }`}>
+                              <div className="flex-1 min-w-0">
+                                <div className={`font-medium text-sm flex items-center gap-2 ${
+                                  isToday ? 'text-yellow-800' : 'text-gray-900'
+                                }`}>
+                                  <span>Oct {dayNum}</span>
+                                  {isWeekend && <span className="text-xs text-blue-600">📅</span>}
+                                  {isToday && <span className="text-xs font-bold">TODAY</span>}
+                                </div>
+                                {weight.notes && (
+                                  <div className="text-xs text-gray-500 truncate mt-1">{weight.notes}</div>
+                                )}
+                              </div>
+                              <div className={`text-lg font-bold ml-2 ${
+                                isToday ? 'text-yellow-700' : 'text-blue-600'
+                              }`}>
+                                {weight.weight}kg
+                              </div>
                             </div>
                           );
-                        }
-                        return null;
-                      }}
-                    />
-                    <Line 
-                      type="monotone" 
-                      dataKey="weight" 
-                      stroke="#3b82f6" 
-                      strokeWidth={3}
-                      dot={{ fill: '#3b82f6', strokeWidth: 2, r: 4 }}
-                      activeDot={{ r: 6, stroke: '#3b82f6', strokeWidth: 2, fill: '#fff' }}
-                    />
-                  </LineChart>
-                </ResponsiveContainer>
+                        })}
+                      </div>
+                    </div>
+                  </div>
+                ))
+                }
                 
-                {/* Graph Statistics */}
-                <div className="grid grid-cols-3 gap-4 mt-4 pt-4 border-t border-gray-200">
-                  <div className="text-center">
-                    <div className="text-lg font-bold text-gray-900">
+                {/* Monthly Summary */}
+                <div className="bg-green-50 border border-green-200 rounded-lg p-4">
+                  <h4 className="font-semibold text-green-800 mb-2">🎉 October Progress Summary</h4>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+                    <div>
+                      <span className="text-green-600 font-medium">Starting:</span>
+                      <div className="font-bold text-green-800">{dailyWeights[dailyWeights.length - 1].weight}kg</div>
+                    </div>
+                    <div>
+                      <span className="text-green-600 font-medium">Current:</span>
+                      <div className="font-bold text-green-800">{dailyWeights[0].weight}kg</div>
+                    </div>
+                    <div>
+                      <span className="text-green-600 font-medium">Days Tracked:</span>
+                      <div className="font-bold text-green-800">{dailyWeights.length}/30</div>
+                    </div>
+                    <div>
+                      <span className="text-green-600 font-medium">Consistency:</span>
+                      <div className="font-bold text-green-800">{Math.round((dailyWeights.length / 30) * 100)}%</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              /* Enhanced Graph View */
+              <div className="space-y-4">
+                <div className="h-80">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart
+                      data={dailyWeights.map(weight => ({
+                        date: new Date(weight.date).toLocaleDateString('en-US', { 
+                          month: 'short', 
+                          day: 'numeric' 
+                        }),
+                        weight: weight.weight,
+                        fullDate: weight.date,
+                        notes: weight.notes,
+                        dayOfWeek: new Date(weight.date).toLocaleDateString('en-US', { weekday: 'short' })
+                      })).reverse()}
+                      margin={{
+                        top: 5,
+                        right: 30,
+                        left: 20,
+                        bottom: 5,
+                      }}
+                    >
+                      <CartesianGrid strokeDasharray="3 3" stroke="#f0f0f0" />
+                      <XAxis 
+                        dataKey="date" 
+                        tick={{ fontSize: 11 }}
+                        stroke="#666"
+                        interval={2}
+                      />
+                      <YAxis 
+                        domain={['dataMin - 0.3', 'dataMax + 0.3']}
+                        tick={{ fontSize: 12 }}
+                        stroke="#666"
+                        label={{ value: 'Weight (kg)', angle: -90, position: 'insideLeft' }}
+                      />
+                      <Tooltip 
+                        content={({ active, payload, label }) => {
+                          if (active && payload && payload.length) {
+                            const data = payload[0].payload;
+                            return (
+                              <div className="bg-white p-4 border border-gray-200 rounded-lg shadow-lg">
+                                <p className="font-semibold text-gray-900">{data.dayOfWeek}, {label}</p>
+                                <p className="text-blue-600 font-bold text-lg">
+                                  {data.weight}kg
+                                </p>
+                                {data.notes && (
+                                  <p className="text-sm text-gray-600 mt-2 italic">{data.notes}</p>
+                                )}
+                              </div>
+                            );
+                          }
+                          return null;
+                        }}
+                      />
+                      <Line 
+                        type="monotone" 
+                        dataKey="weight" 
+                        stroke="#2563eb" 
+                        strokeWidth={3}
+                        dot={{ fill: '#2563eb', strokeWidth: 2, r: 3 }}
+                        activeDot={{ r: 6, stroke: '#2563eb', strokeWidth: 3, fill: '#fff' }}
+                      />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
+                
+                {/* Enhanced Graph Statistics */}
+                <div className="grid grid-cols-2 md:grid-cols-5 gap-4 pt-4 border-t border-gray-200">
+                  <div className="text-center p-3 bg-red-50 rounded-lg">
+                    <div className="text-lg font-bold text-red-600">
                       {Math.max(...dailyWeights.map(w => w.weight))}kg
                     </div>
-                    <div className="text-xs text-gray-500">Highest</div>
+                    <div className="text-xs text-red-700">Month High</div>
+                    <div className="text-xs text-gray-500">Oct 1st</div>
                   </div>
-                  <div className="text-center">
-                    <div className="text-lg font-bold text-gray-900">
+                  <div className="text-center p-3 bg-green-50 rounded-lg">
+                    <div className="text-lg font-bold text-green-600">
                       {Math.min(...dailyWeights.map(w => w.weight))}kg
                     </div>
-                    <div className="text-xs text-gray-500">Lowest</div>
+                    <div className="text-xs text-green-700">Month Low</div>
+                    <div className="text-xs text-gray-500">Oct 30th</div>
                   </div>
-                  <div className="text-center">
+                  <div className="text-center p-3 bg-blue-50 rounded-lg">
                     <div className="text-lg font-bold text-blue-600">
-                      {(Math.max(...dailyWeights.map(w => w.weight)) - Math.min(...dailyWeights.map(w => w.weight))).toFixed(1)}kg
+                      {(dailyWeights.reduce((sum, w) => sum + w.weight, 0) / dailyWeights.length).toFixed(1)}kg
                     </div>
-                    <div className="text-xs text-gray-500">Change</div>
+                    <div className="text-xs text-blue-700">Average</div>
+                    <div className="text-xs text-gray-500">30 days</div>
+                  </div>
+                  <div className="text-center p-3 bg-purple-50 rounded-lg">
+                    <div className="text-lg font-bold text-purple-600">
+                      -{(Math.max(...dailyWeights.map(w => w.weight)) - Math.min(...dailyWeights.map(w => w.weight))).toFixed(1)}kg
+                    </div>
+                    <div className="text-xs text-purple-700">Total Loss</div>
+                    <div className="text-xs text-gray-500">Progress</div>
+                  </div>
+                  <div className="text-center p-3 bg-orange-50 rounded-lg">
+                    <div className="text-lg font-bold text-orange-600">
+                      -{((dailyWeights[dailyWeights.length-1].weight - dailyWeights[0].weight) / 4.3).toFixed(2)}kg
+                    </div>
+                    <div className="text-xs text-orange-700">Weekly Rate</div>
+                    <div className="text-xs text-gray-500">Average</div>
+                  </div>
+                </div>
+                
+                {/* Weekly Milestones */}
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <h4 className="font-medium text-gray-900 mb-3">🏆 Weekly Milestones</h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
+                    {[
+                      { week: 'Week 1', start: 78.2, end: 77.8, loss: 0.4 },
+                      { week: 'Week 2', start: 77.8, end: 77.0, loss: 0.8 },
+                      { week: 'Week 3', start: 77.0, end: 76.4, loss: 0.6 },
+                      { week: 'Week 4+', start: 76.4, end: 75.2, loss: 1.2 }
+                    ].map((week, index) => (
+                      <div key={index} className="text-center p-3 bg-white rounded border">
+                        <div className="font-medium text-gray-900">{week.week}</div>
+                        <div className="text-sm text-gray-600">
+                          {week.start}kg → {week.end}kg
+                        </div>
+                        <div className="text-lg font-bold text-green-600">
+                          -{week.loss}kg
+                        </div>
+                      </div>
+                    ))}
                   </div>
                 </div>
               </div>
