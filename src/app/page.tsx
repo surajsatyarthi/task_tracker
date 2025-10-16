@@ -83,14 +83,54 @@ const bmnTasks: Task[] = [
   { id: 'bmn19', project_id: 'bmn', title: 'YouTube Short 2', description: 'Marketing tip', status: 'todo', priority: 'not_urgent_not_important', is_urgent: false, is_important: false, links: ['https://www.youtube.com/shorts/BHNPabuv3p8'], created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
 ];
 
-// Empty tasks for CSuite - starting fresh
+// CSuite tasks - Executive and operational focus
+const csuiteTasks: Task[] = [
+  // URGENT & IMPORTANT - Do First (Red)
+  { id: 'cs1', project_id: 'csuite', title: 'Operations cycle for 1 client', status: 'todo', priority: 'urgent_important', is_urgent: true, is_important: true, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  { id: 'cs2', project_id: 'csuite', title: 'Send report to Eric Waldenmaier', status: 'todo', priority: 'urgent_important', is_urgent: true, is_important: true, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  { id: 'cs3', project_id: 'csuite', title: 'Cold email setup', status: 'todo', priority: 'urgent_important', is_urgent: true, is_important: true, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  { id: 'cs4', project_id: 'csuite', title: 'Report link tracking for client', status: 'todo', priority: 'urgent_important', is_urgent: true, is_important: true, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  { id: 'cs5', project_id: 'csuite', title: 'Expand team for sales', status: 'todo', priority: 'urgent_important', is_urgent: true, is_important: true, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  
+  // URGENT & NOT IMPORTANT - Delegate (Orange)
+  { id: 'cs6', project_id: 'csuite', title: '123/1000 followers on page job', status: 'todo', priority: 'urgent_not_important', is_urgent: true, is_important: false, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  { id: 'cs7', project_id: 'csuite', title: '10 LinkedIn accounts', status: 'todo', priority: 'urgent_not_important', is_urgent: true, is_important: false, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  { id: 'cs8', project_id: 'csuite', title: 'Manyreach Email Automation Setup', status: 'todo', priority: 'urgent_not_important', is_urgent: true, is_important: false, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  { id: 'cs9', project_id: 'csuite', title: 'Flush linkedin page of posts', status: 'todo', priority: 'urgent_not_important', is_urgent: true, is_important: false, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  { id: 'cs10', project_id: 'csuite', title: 'Mahsa linkedin profile', status: 'todo', priority: 'urgent_not_important', is_urgent: true, is_important: false, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  { id: 'cs11', project_id: 'csuite', title: 'Sanitize Linkedin profile', status: 'todo', priority: 'urgent_not_important', is_urgent: true, is_important: false, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  { id: 'cs12', project_id: 'csuite', title: 'Review post design', status: 'todo', priority: 'urgent_not_important', is_urgent: true, is_important: false, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  { id: 'cs13', project_id: 'csuite', title: '5 fake emails', status: 'todo', priority: 'urgent_not_important', is_urgent: true, is_important: false, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  { id: 'cs14', project_id: 'csuite', title: '5 fake LinkedIn DM', status: 'todo', priority: 'urgent_not_important', is_urgent: true, is_important: false, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  
+  // NOT URGENT & IMPORTANT - Schedule (Green)
+  { id: 'cs15', project_id: 'csuite', title: 'Create Services Page for each of the Service (Website + LinkedIn)', status: 'todo', priority: 'not_urgent_important', is_urgent: false, is_important: true, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  { id: 'cs16', project_id: 'csuite', title: 'FAQ for Csuite', status: 'todo', priority: 'not_urgent_important', is_urgent: false, is_important: true, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  { id: 'cs17', project_id: 'csuite', title: 'Revamp case studies', status: 'todo', priority: 'not_urgent_important', is_urgent: false, is_important: true, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  { id: 'cs18', project_id: 'csuite', title: 'Send form to interns for hiring', status: 'todo', priority: 'not_urgent_important', is_urgent: false, is_important: true, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  { id: 'cs19', project_id: 'csuite', title: 'Improve offer based on Alex Hormozi', status: 'todo', priority: 'not_urgent_important', is_urgent: false, is_important: true, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  { id: 'cs20', project_id: 'csuite', title: 'Reduce 3 months based on Chandan', status: 'todo', priority: 'not_urgent_important', is_urgent: false, is_important: true, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  { id: 'cs21', project_id: 'csuite', title: 'Super.com Operating Blueprint', description: 'OKRs and methodology for scaling $0 to $200M+ revenues', status: 'todo', priority: 'not_urgent_important', is_urgent: false, is_important: true, links: ['https://henrythe9th.substack.com/p/supercoms-operating-blueprint'], created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  { id: 'cs22', project_id: 'csuite', title: 'Linkmate.io - LinkedIn Message Tracking', description: 'Tool to track if messages are read or not', status: 'todo', priority: 'not_urgent_important', is_urgent: false, is_important: true, links: ['https://linkmate.io/'], created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  { id: 'cs23', project_id: 'csuite', title: 'LinkedIn Tweaks by Marvin', description: 'Bootstrapped Giants LinkedIn optimization guide', status: 'todo', priority: 'not_urgent_important', is_urgent: false, is_important: true, links: ['https://grow.bootstrappedgiants.com/Loom-with-my-LinkedIn-Tweaks-1ea940d92a1f80e089e1c7fb59090a81'], created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  
+  // NOT URGENT & NOT IMPORTANT - Eliminate (Blue)
+  { id: 'cs24', project_id: 'csuite', title: '100 million offer', status: 'todo', priority: 'not_urgent_not_important', is_urgent: false, is_important: false, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  { id: 'cs25', project_id: 'csuite', title: '100 million lead', status: 'todo', priority: 'not_urgent_not_important', is_urgent: false, is_important: false, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  { id: 'cs26', project_id: 'csuite', title: 'Boring Marketer Twitter Thread', description: 'Marketing insights and strategies', status: 'todo', priority: 'not_urgent_not_important', is_urgent: false, is_important: false, links: ['https://x.com/boringmarketer/status/1930327867990462495'], created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  { id: 'cs27', project_id: 'csuite', title: 'YouTube Video - Educational Content', description: 'Business/marketing educational video', status: 'todo', priority: 'not_urgent_not_important', is_urgent: false, is_important: false, links: ['https://www.youtube.com/watch?v=EDJMrlk4xIw'], created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  { id: 'cs28', project_id: 'csuite', title: 'Julian Goldie SEO Twitter Thread', description: 'SEO insights and tips', status: 'todo', priority: 'not_urgent_not_important', is_urgent: false, is_important: false, links: ['https://x.com/JulianGoldieSEO/status/1932180908087324844'], created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  { id: 'cs29', project_id: 'csuite', title: 'Natia Kourdadze Twitter Profile', description: 'SEO expert insights and content', status: 'todo', priority: 'not_urgent_not_important', is_urgent: false, is_important: false, links: ['https://x.com/natiakourdadze'], created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  { id: 'cs30', project_id: 'csuite', title: 'YouTube Tutorial Video', description: 'Business process tutorial', status: 'todo', priority: 'not_urgent_not_important', is_urgent: false, is_important: false, links: ['https://youtu.be/IhEy5s-Z_Jg?si=ejIDAGyjsCBzIOwb'], created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+];
+
+// Empty tasks placeholder
 const otherTasks: Task[] = [
-  // CSuite project starts with no tasks - clean slate from Oct 17, 2025
   // Health project uses workout tracking system instead of task management
   // Journaling project has its own dedicated dashboard
 ];
 
-const mockTasks: Task[] = [...personalTasks, ...bmnTasks, ...otherTasks];
+const mockTasks: Task[] = [...personalTasks, ...bmnTasks, ...csuiteTasks, ...otherTasks];
 
 type ViewMode = 'matrix' | 'table' | 'calendar' | 'workout';
 
