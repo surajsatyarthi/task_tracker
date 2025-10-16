@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
-import { Task, TaskPriority } from '@/types/task';
+import { Task, TaskPriority, sortTasksForMatrix } from '@/types/task';
 import TaskCard from './TaskCard';
 
 interface EisenhowerMatrixProps {
@@ -57,7 +57,7 @@ const EisenhowerMatrix: React.FC<EisenhowerMatrixProps> = ({
   };
 
   const getTasksByPriority = (priority: TaskPriority) => {
-    return tasks.filter(task => task.priority === priority);
+    return sortTasksForMatrix(tasks, priority);
   };
 
   return (

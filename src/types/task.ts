@@ -100,6 +100,49 @@ export const statusConfig = {
   help_me: { label: 'Help Needed', color: 'bg-purple-100 text-purple-800', icon: '🆘' },
 };
 
+// Task sorting utilities
+const statusOrder: Record<TaskStatus, number> = {
+  'todo': 1,
+  'doing': 2,
+  'on_hold': 3,
+  'help_me': 4,
+  'done': 5,
+};
+
+const priorityOrder: Record<TaskPriority, number> = {
+  'urgent_important': 1,
+  'urgent_not_important': 2,
+  'not_urgent_important': 3,
+  'not_urgent_not_important': 4,
+};
+
+export const sortTasks = (tasks: Task[]): Task[] => {
+  return [...tasks].sort((a, b) => {
+    // First sort by status
+    const statusDiff = statusOrder[a.status] - statusOrder[b.status];
+    if (statusDiff !== 0) return statusDiff;
+    
+    // Then sort by priority (Eisenhower Matrix)
+    const priorityDiff = priorityOrder[a.priority] - priorityOrder[b.priority];
+    if (priorityDiff !== 0) return priorityDiff;
+    
+    // Finally sort by creation date (newest first)
+    return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+  });
+};
+
+export const sortTasksForMatrix = (tasks: Task[], priority: TaskPriority): Task[] => {
+  const priorityTasks = tasks.filter(task => task.priority === priority);
+  return [...priorityTasks].sort((a, b) => {
+    // Sort by status first
+    const statusDiff = statusOrder[a.status] - statusOrder[b.status];
+    if (statusDiff !== 0) return statusDiff;
+    
+    // Then by creation date (newest first)
+    return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+  });
+};
+
 // CSV parsing helpers
 export const parseCSVStatus = (status: string): TaskStatus => {
   const normalizedStatus = status.toLowerCase().trim();

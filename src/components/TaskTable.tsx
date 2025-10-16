@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Task, statusConfig } from '@/types/task';
+import { Task, statusConfig, sortTasks } from '@/types/task';
 import { CalendarIcon, UserIcon, LinkIcon } from '@heroicons/react/24/outline';
 
 interface TaskTableProps {
@@ -19,6 +19,7 @@ const priorityConfig = {
 
 const TaskTable: React.FC<TaskTableProps> = ({ tasks, onTaskClick, projectId }) => {
   const isPersonalProject = projectId === 'personal';
+  const sortedTasks = sortTasks(tasks);
   if (tasks.length === 0) {
     return (
       <div className="bg-white rounded-lg shadow-sm border border-gray-200">
@@ -60,7 +61,7 @@ const TaskTable: React.FC<TaskTableProps> = ({ tasks, onTaskClick, projectId }) 
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {tasks.map((task) => {
+            {sortedTasks.map((task) => {
               const statusStyle = statusConfig[task.status];
               const priorityStyle = priorityConfig[task.priority];
               
