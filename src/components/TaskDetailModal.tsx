@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { Task, TaskStatus, statusConfig, getTodayDate } from '@/types/task';
-import { XMarkIcon, LinkIcon, PencilIcon } from '@heroicons/react/24/outline';
+import { XMarkIcon, LinkIcon } from '@heroicons/react/24/outline';
 
 interface TaskDetailModalProps {
   task: Task | null;
@@ -65,21 +65,12 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ task, isOpen, onClose
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
           <h2 className="text-xl font-semibold text-gray-900">Task Details</h2>
-          <div className="flex items-center gap-2">
-            <button
-              onClick={handleEdit}
-              className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
-              title="Edit task"
-            >
-              <PencilIcon className="w-5 h-5" />
-            </button>
-            <button
-              onClick={onClose}
-              className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
-            >
-              <XMarkIcon className="w-5 h-5" />
-            </button>
-          </div>
+          <button
+            onClick={onClose}
+            className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
+          >
+            <XMarkIcon className="w-5 h-5" />
+          </button>
         </div>
 
         {/* Content */}
@@ -275,12 +266,20 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ task, isOpen, onClose
               </button>
             </>
           ) : (
-            <button
-              onClick={onClose}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors"
-            >
-              Close
-            </button>
+            <>
+              <button
+                onClick={onClose}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors"
+              >
+                Close
+              </button>
+              <button
+                onClick={handleEdit}
+                className="px-4 py-2 text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 rounded-md transition-colors"
+              >
+                Edit
+              </button>
+            </>
           )}
         </div>
       </div>

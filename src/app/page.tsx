@@ -390,7 +390,6 @@ export default function Home() {
               tasks={filteredTasks}
               onTaskMove={handleTaskMove}
               onTaskClick={handleTaskClick}
-              onTaskEdit={handleTaskClick}
             />
           ) : viewMode === 'table' ? (
             <TaskTable 

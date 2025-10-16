@@ -9,7 +9,6 @@ interface EisenhowerMatrixProps {
   tasks: Task[];
   onTaskMove: (taskId: string, newPriority: TaskPriority) => void;
   onTaskClick: (task: Task) => void;
-  onTaskEdit?: (task: Task) => void;
 }
 
 const priorityConfig = {
@@ -47,7 +46,6 @@ const EisenhowerMatrix: React.FC<EisenhowerMatrixProps> = ({
   tasks,
   onTaskMove,
   onTaskClick,
-  onTaskEdit,
 }) => {
   const handleDragEnd = (result: DropResult) => {
     if (!result.destination) return;
@@ -114,12 +112,11 @@ const EisenhowerMatrix: React.FC<EisenhowerMatrixProps> = ({
                               transition-all duration-200 tap-target
                               ${snapshot.isDragging ? 'opacity-75 rotate-1 sm:rotate-2 scale-105' : ''}
                             `}
+                            onClick={() => onTaskClick(task)}
                           >
                             <TaskCard
                               task={task}
                               isDragging={snapshot.isDragging}
-                              onClick={() => onTaskClick(task)}
-                              onEdit={onTaskEdit ? () => onTaskEdit(task) : undefined}
                             />
                           </div>
                         )}
