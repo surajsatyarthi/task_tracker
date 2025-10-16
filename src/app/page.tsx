@@ -8,6 +8,7 @@ import TaskDetailModal from '@/components/TaskDetailModal';
 import AddTaskModal from '@/components/AddTaskModal';
 import HealthDashboard from '@/components/HealthDashboard';
 import JournalDashboard from '@/components/JournalDashboard';
+import LinkedInTracker from '@/components/LinkedInTracker';
 import { Task, TaskPriority, Project, getFlagsFromPriority } from '@/types/task';
 import { Squares2X2Icon, TableCellsIcon, CalendarIcon, ArchiveBoxIcon } from '@heroicons/react/24/outline';
 
@@ -18,6 +19,7 @@ const projects: Project[] = [
   { id: 'csuite', name: 'CSuite', slug: 'csuite', color: '#dc2626', is_active: true, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
   { id: 'health', name: 'Health', slug: 'health', color: '#f59e0b', is_active: true, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
   { id: 'journaling', name: 'Journaling', slug: 'journaling', color: '#8b5cf6', is_active: true, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  { id: 'linkedin', name: 'LinkedIn', slug: 'linkedin', color: '#0077b5', is_active: true, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
 ];
 
 // Personal tasks from CSV - ALL set to 'todo' status as requested (no due dates)
@@ -151,6 +153,8 @@ export default function Home() {
       setViewMode('workout'); // Health project only shows workout tracker
     } else if (projectId === 'journaling') {
       setViewMode('matrix'); // Journaling will get its own view later
+    } else if (projectId === 'linkedin') {
+      setViewMode('workout'); // LinkedIn uses dedicated tracker
     } else {
       setViewMode('matrix'); // Regular projects use matrix/table
     }
@@ -234,8 +238,8 @@ export default function Home() {
               </p>
             </div>
             <div className="flex items-center gap-2 sm:gap-4">
-              {/* Hide Add Task button for Health and Journaling projects */}
-              {activeProject !== 'health' && activeProject !== 'journaling' && (
+              {/* Hide Add Task button for Health, Journaling, and LinkedIn projects */}
+              {activeProject !== 'health' && activeProject !== 'journaling' && activeProject !== 'linkedin' && (
                 <button 
                   onClick={() => setIsAddModalOpen(true)}
                   className="bg-green-600 text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-green-700 transition-colors text-sm sm:text-base"
@@ -305,6 +309,8 @@ export default function Home() {
                     ? 'Your comprehensive fitness tracking system' 
                     : activeProject === 'journaling'
                     ? 'Your mental wellbeing companion'
+                    : activeProject === 'linkedin'
+                    ? 'Track your LinkedIn posting schedule (Monday & Thursday)'
                     : showArchived
                     ? `${filteredTasks.length} completed task${filteredTasks.length !== 1 ? 's' : ''} archived`
                     : `${filteredTasks.length} active task${filteredTasks.length !== 1 ? 's' : ''} in this project`
@@ -312,8 +318,8 @@ export default function Home() {
                 </p>
               </div>
               
-              {/* View Toggle and Archive Toggle - Hide for Health and Journaling projects */}
-              {activeProject !== 'health' && activeProject !== 'journaling' && (
+              {/* View Toggle and Archive Toggle - Hide for Health, Journaling, and LinkedIn projects */}
+              {activeProject !== 'health' && activeProject !== 'journaling' && activeProject !== 'linkedin' && (
                 <div className="flex items-center gap-3">
                   {/* Archive Toggle */}
                   <button
@@ -387,6 +393,8 @@ export default function Home() {
             <HealthDashboard />
           ) : activeProject === 'journaling' ? (
             <JournalDashboard />
+          ) : activeProject === 'linkedin' ? (
+            <LinkedInTracker />
           ) : viewMode === 'matrix' ? (
             <EisenhowerMatrix 
               tasks={filteredTasks}

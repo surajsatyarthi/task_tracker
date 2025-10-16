@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Task, TaskStatus, statusConfig } from '@/types/task';
+import { Task, TaskStatus, statusConfig, getTodayDate } from '@/types/task';
 import { XMarkIcon, LinkIcon, PencilIcon } from '@heroicons/react/24/outline';
 
 interface TaskDetailModalProps {
@@ -35,6 +35,7 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ task, isOpen, onClose
       status: task.status,
       priority: task.priority,
       remarks: task.remarks,
+      due_date: task.due_date,
     });
   };
 
@@ -115,8 +116,8 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ task, isOpen, onClose
             </div>
           )}
 
-          {/* Status and Priority */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          {/* Status, Priority and Due Date */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
               <label className="block text-sm font-bold text-gray-900 mb-2">Status</label>
               {isEditing ? (
@@ -145,6 +146,33 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ task, isOpen, onClose
                 <span className="mr-2">{priorityStyle.icon}</span>
                 {priorityStyle.label}
               </span>
+            </div>
+
+            <div>
+              <label className="block text-sm font-bold text-gray-900 mb-2">Due Date</label>
+              {isEditing ? (
+                <input
+                  type="date"
+                  value={editedTask.due_date || ''}
+                  onChange={(e) => setEditedTask({ ...editedTask, due_date: e.target.value || undefined })}
+                  min={getTodayDate()}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 font-medium"
+                />
+              ) : (
+                <div className="text-gray-900 font-medium">
+                  {currentTask.due_date ? (
+                    <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold ${
+                      new Date(currentTask.due_date) < new Date(getTodayDate()) 
+                        ? 'bg-red-100 text-red-800' 
+                        : 'bg-blue-100 text-blue-800'
+                    }`}>
+                      📅 {new Date(currentTask.due_date).toLocaleDateString()}
+                    </span>
+                  ) : (
+                    <span className="text-gray-500 italic">No deadline</span>
+                  )}
+                </div>
+              )}
             </div>
           </div>
 
