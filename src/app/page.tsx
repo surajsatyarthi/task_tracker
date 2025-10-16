@@ -55,6 +55,7 @@ const personalTasks: Task[] = [
   { id: 'p26', project_id: 'personal', title: 'Julian Goldie SEO Thread 2', description: 'https://x.com/JulianGoldieSEO/status/1977444094298476979', status: 'todo', priority: 'not_urgent_important', is_urgent: false, is_important: true, links: ['https://x.com/JulianGoldieSEO/status/1977444094298476979'], created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
   { id: 'p27', project_id: 'personal', title: 'Watch Starter Story Build Program', description: 'Starter Story Build lesson on business development', status: 'todo', priority: 'not_urgent_important', is_urgent: false, is_important: true, links: ['https://build.starterstory.com/programs/173/lessons/123861'], created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
   { id: 'p28', project_id: 'personal', title: 'Close useless credit cards', status: 'todo', priority: 'not_urgent_important', is_urgent: false, is_important: true, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  { id: 'p29', project_id: 'personal', title: 'Post vehicle and flat ad on internet', status: 'todo', priority: 'not_urgent_important', is_urgent: false, is_important: true, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
 ];
 
 // BMN tasks - Business and Marketing focused
