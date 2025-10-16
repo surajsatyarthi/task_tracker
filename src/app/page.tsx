@@ -5,6 +5,8 @@ import EisenhowerMatrix from '@/components/EisenhowerMatrix';
 import TaskTable from '@/components/TaskTable';
 import TaskDetailModal from '@/components/TaskDetailModal';
 import AddTaskModal from '@/components/AddTaskModal';
+import HealthDashboard from '@/components/HealthDashboard';
+import JournalDashboard from '@/components/JournalDashboard';
 import { Task, TaskPriority, Project, getFlagsFromPriority } from '@/types/task';
 import { Squares2X2Icon, TableCellsIcon } from '@heroicons/react/24/outline';
 
@@ -122,7 +124,7 @@ const otherTasks: Task[] = [
 
 const mockTasks: Task[] = [...personalTasks, ...otherTasks];
 
-type ViewMode = 'matrix' | 'table';
+type ViewMode = 'matrix' | 'table' | 'workout';
 
 export default function Home() {
   const [tasks, setTasks] = useState<Task[]>(mockTasks);
@@ -130,6 +132,18 @@ export default function Home() {
   const [activeProject, setActiveProject] = useState<string>('personal');
   const [viewMode, setViewMode] = useState<ViewMode>('matrix');
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+
+  const handleProjectChange = (projectId: string) => {
+    setActiveProject(projectId);
+    // Set appropriate view mode based on project
+    if (projectId === 'health') {
+      setViewMode('workout'); // Health project only shows workout tracker
+    } else if (projectId === 'journaling') {
+      setViewMode('matrix'); // Journaling will get its own view later
+    } else {
+      setViewMode('matrix'); // Regular projects use matrix/table
+    }
+  };
 
   const handleTaskMove = (taskId: string, newPriority: TaskPriority) => {
     setTasks(prevTasks => 
@@ -200,12 +214,15 @@ export default function Home() {
               </p>
             </div>
             <div className="flex items-center gap-2 sm:gap-4">
-              <button 
-                onClick={() => setIsAddModalOpen(true)}
-                className="bg-green-600 text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-green-700 transition-colors text-sm sm:text-base"
-              >
-                Add Task
-              </button>
+              {/* Hide Add Task button for Health and Journaling projects */}
+              {activeProject !== 'health' && activeProject !== 'journaling' && (
+                <button 
+                  onClick={() => setIsAddModalOpen(true)}
+                  className="bg-green-600 text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-green-700 transition-colors text-sm sm:text-base"
+                >
+                  Add Task
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -220,7 +237,7 @@ export default function Home() {
               return (
                 <button
                   key={project.id}
-                  onClick={() => setActiveProject(project.id)}
+                  onClick={() => handleProjectChange(project.id)}
                   className={`
                     whitespace-nowrap py-3 sm:py-4 px-2 sm:px-1 border-b-2 font-medium text-sm transition-colors flex-shrink-0
                     ${
@@ -264,45 +281,56 @@ export default function Home() {
                   <span className="sm:hidden">{currentProject?.name}</span>
                 </h2>
                 <p className="text-gray-600 mt-1 text-sm sm:text-base">
-                  {filteredTasks.length} task{filteredTasks.length !== 1 ? 's' : ''} in this project
+                  {activeProject === 'health' 
+                    ? 'Your comprehensive fitness tracking system' 
+                    : activeProject === 'journaling'
+                    ? 'Your mental wellbeing companion'
+                    : `${filteredTasks.length} task${filteredTasks.length !== 1 ? 's' : ''} in this project`
+                  }
                 </p>
               </div>
               
-              {/* View Toggle */}
-              <div className="flex items-center bg-gray-100 rounded-lg p-1">
-                <button
-                  onClick={() => setViewMode('matrix')}
-                  className={`
-                    flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-2 rounded-md text-xs sm:text-sm font-medium transition-colors
-                    ${
-                      viewMode === 'matrix'
-                        ? 'bg-white text-gray-900 shadow-sm'
-                        : 'text-gray-600 hover:text-gray-900'
-                    }
-                  `}
-                >
-                  <Squares2X2Icon className="w-4 h-4" />
-                  <span className="hidden sm:inline">Matrix</span>
-                </button>
-                <button
-                  onClick={() => setViewMode('table')}
-                  className={`
-                    flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-2 rounded-md text-xs sm:text-sm font-medium transition-colors
-                    ${
-                      viewMode === 'table'
-                        ? 'bg-white text-gray-900 shadow-sm'
-                        : 'text-gray-600 hover:text-gray-900'
-                    }
-                  `}
-                >
-                  <TableCellsIcon className="w-4 h-4" />
-                  <span className="hidden sm:inline">Table</span>
-                </button>
-              </div>
+              {/* View Toggle - Hide for Health and Journaling projects */}
+              {activeProject !== 'health' && activeProject !== 'journaling' && (
+                <div className="flex items-center bg-gray-100 rounded-lg p-1">
+                  <button
+                    onClick={() => setViewMode('matrix')}
+                    className={`
+                      flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-2 rounded-md text-xs sm:text-sm font-medium transition-colors
+                      ${
+                        viewMode === 'matrix'
+                          ? 'bg-white text-gray-900 shadow-sm'
+                          : 'text-gray-600 hover:text-gray-900'
+                      }
+                    `}
+                  >
+                    <Squares2X2Icon className="w-4 h-4" />
+                    <span className="hidden sm:inline">Matrix</span>
+                  </button>
+                  <button
+                    onClick={() => setViewMode('table')}
+                    className={`
+                      flex items-center gap-1 sm:gap-2 px-2 sm:px-3 py-2 rounded-md text-xs sm:text-sm font-medium transition-colors
+                      ${
+                        viewMode === 'table'
+                          ? 'bg-white text-gray-900 shadow-sm'
+                          : 'text-gray-600 hover:text-gray-900'
+                      }
+                    `}
+                  >
+                    <TableCellsIcon className="w-4 h-4" />
+                    <span className="hidden sm:inline">Table</span>
+                  </button>
+                </div>
+              )}
             </div>
           </div>
-          {/* Content based on view mode */}
-          {viewMode === 'matrix' ? (
+          {/* Content based on project type */}
+          {activeProject === 'health' ? (
+            <HealthDashboard />
+          ) : activeProject === 'journaling' ? (
+            <JournalDashboard />
+          ) : viewMode === 'matrix' ? (
             <EisenhowerMatrix 
               tasks={filteredTasks}
               onTaskMove={handleTaskMove}

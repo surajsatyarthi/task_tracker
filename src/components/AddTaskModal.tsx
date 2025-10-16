@@ -18,11 +18,24 @@ const priorityConfig = {
   not_urgent_not_important: { label: 'Eliminate', color: 'bg-blue-100 text-blue-800', icon: '🗑️' },
 };
 
+// Available projects for task creation
+const AVAILABLE_PROJECTS = [
+  { id: 'personal', name: 'Personal', color: '#6366f1' },
+  { id: 'bmn', name: 'BMN', color: '#10b981' },
+  { id: 'csuite', name: 'CSuite', color: '#dc2626' },
+];
+
 const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onAdd, currentProject }) => {
+  // Ensure the current project is one of the available projects, default to personal
+  const getValidProject = (projectId: string) => {
+    return AVAILABLE_PROJECTS.find(p => p.id === projectId) ? projectId : 'personal';
+  };
+
   const [formData, setFormData] = useState({
     title: '',
     description: '',
     priority: 'not_urgent_not_important' as TaskPriority,
+    project_id: getValidProject(currentProject),
     remarks: '',
     links: [] as string[],
     tags: [] as string[],
@@ -54,7 +67,7 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onAdd, cur
     const { isUrgent, isImportant } = getFlagsFromPriority(formData.priority);
     
     const newTask: Omit<Task, 'id' | 'created_at' | 'updated_at'> = {
-      project_id: currentProject,
+      project_id: formData.project_id,
       title: formData.title.trim(),
       description: formData.description.trim() || undefined,
       status: 'todo', // All new tasks start as 'todo'
@@ -77,6 +90,7 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onAdd, cur
       title: '',
       description: '',
       priority: 'not_urgent_not_important',
+      project_id: getValidProject(currentProject),
       remarks: '',
       links: [],
       tags: [],
@@ -153,7 +167,7 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onAdd, cur
               type="text"
               value={formData.title}
               onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
-              className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent ${
+              className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder:text-gray-500 ${
                 errors.title ? 'border-red-300' : 'border-gray-300'
               }`}
               placeholder="Enter task title..."
@@ -161,6 +175,24 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onAdd, cur
             {errors.title && (
               <p className="text-red-500 text-sm mt-1">{errors.title}</p>
             )}
+          </div>
+
+          {/* Project Selection */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Project *
+            </label>
+            <select
+              value={formData.project_id}
+              onChange={(e) => setFormData(prev => ({ ...prev, project_id: e.target.value }))}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            >
+              {AVAILABLE_PROJECTS.map((project) => (
+                <option key={project.id} value={project.id}>
+                  {project.name}
+                </option>
+              ))}
+            </select>
           </div>
 
           {/* Description */}
@@ -172,7 +204,7 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onAdd, cur
               value={formData.description}
               onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
               rows={3}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder:text-gray-500"
               placeholder="Enter task description..."
             />
           </div>
@@ -234,8 +266,8 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onAdd, cur
                 value={linkInput}
                 onChange={(e) => setLinkInput(e.target.value)}
                 onKeyPress={(e) => handleKeyPress(e, addLink)}
-                className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="Enter URL and press Enter..."
+                className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder:text-gray-500"
+                placeholder="https://example.com"
               />
               <button
                 type="button"
@@ -274,8 +306,8 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onAdd, cur
                 value={tagInput}
                 onChange={(e) => setTagInput(e.target.value)}
                 onKeyPress={(e) => handleKeyPress(e, addTag)}
-                className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                placeholder="Enter tag and press Enter..."
+                className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder:text-gray-500"
+                placeholder="urgent, meeting, research"
               />
               <button
                 type="button"
@@ -315,8 +347,8 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onAdd, cur
               value={formData.remarks}
               onChange={(e) => setFormData(prev => ({ ...prev, remarks: e.target.value }))}
               rows={2}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              placeholder="Any additional notes..."
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder:text-gray-500"
+              placeholder="Any additional notes or context..."
             />
           </div>
 
