@@ -416,7 +416,7 @@ export const generateWorkoutWeeks = (): WorkoutWeek[] => {
   const weeksToGenerate = 52; // 1 year
   
   // Calculate which day of the week Oct 17 falls on (0=Sunday, 1=Monday, etc.)
-  const startDayOfWeek = startDate.getDay(); // Friday = 5
+  // const startDayOfWeek = startDate.getDay(); // Friday = 5 (unused for now)
   
   // Create continuous daily workouts starting from Oct 17
   const allWorkoutDays: WorkoutDay[] = [];
@@ -447,7 +447,7 @@ export const generateWorkoutWeeks = (): WorkoutWeek[] => {
   }
   
   // Group workout days into weeks (Monday to Sunday)
-  let currentWeekStart = new Date('2025-10-13'); // Monday of week containing Oct 17
+  const currentWeekStart = new Date('2025-10-13'); // Monday of week containing Oct 17
   
   for (let weekIndex = 0; weekIndex < weeksToGenerate; weekIndex++) {
     const weekStart = new Date(currentWeekStart);
