@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Task, TaskStatus, TaskPriority, statusConfig, getFlagsFromPriority } from '@/types/task';
+import { Task, TaskPriority, getFlagsFromPriority } from '@/types/task';
 import { XMarkIcon, PlusIcon } from '@heroicons/react/24/outline';
 
 interface AddTaskModalProps {
@@ -22,7 +22,6 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onAdd, cur
   const [formData, setFormData] = useState({
     title: '',
     description: '',
-    status: 'todo' as TaskStatus,
     priority: 'not_urgent_not_important' as TaskPriority,
     remarks: '',
     links: [] as string[],
@@ -58,7 +57,7 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onAdd, cur
       project_id: currentProject,
       title: formData.title.trim(),
       description: formData.description.trim() || undefined,
-      status: formData.status,
+      status: 'todo', // All new tasks start as 'todo'
       priority: formData.priority,
       is_urgent: isUrgent,
       is_important: isImportant,
@@ -77,7 +76,6 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onAdd, cur
     setFormData({
       title: '',
       description: '',
-      status: 'todo',
       priority: 'not_urgent_not_important',
       remarks: '',
       links: [],
@@ -179,28 +177,20 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onAdd, cur
             />
           </div>
 
-          {/* Status and Priority */}
+          {/* Status Info and Priority */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
                 Status
               </label>
-              <select
-                value={formData.status}
-                onChange={(e) => setFormData(prev => ({ ...prev, status: e.target.value as TaskStatus }))}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-              >
-                {Object.entries(statusConfig).map(([status, config]) => (
-                  <option key={status} value={status}>
-                    {config.label}
-                  </option>
-                ))}
-              </select>
+              <div className="px-3 py-2 bg-gray-50 border border-gray-200 rounded-md text-sm text-gray-700">
+                📝 To Do (All new tasks start here)
+              </div>
             </div>
 
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-2">
-                Priority
+                Priority (Eisenhower Matrix)
               </label>
               <select
                 value={formData.priority}
@@ -209,7 +199,7 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onAdd, cur
               >
                 {Object.entries(priorityConfig).map(([priority, config]) => (
                   <option key={priority} value={priority}>
-                    {config.label}
+                    {config.icon} {config.label}
                   </option>
                 ))}
               </select>
