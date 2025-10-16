@@ -53,14 +53,44 @@ const personalTasks: Task[] = [
   { id: 'p26', project_id: 'personal', title: 'Julian Goldie SEO Thread 2', description: 'https://x.com/JulianGoldieSEO/status/1977444094298476979', status: 'todo', priority: 'not_urgent_important', is_urgent: false, is_important: true, links: ['https://x.com/JulianGoldieSEO/status/1977444094298476979'], created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
 ];
 
-// Empty tasks for BMN and CSuite - starting fresh
+// BMN tasks - Business and Marketing focused
+const bmnTasks: Task[] = [
+  // URGENT & IMPORTANT - Do First (Red)
+  { id: 'bmn1', project_id: 'bmn', title: 'Convert export agents into affiliates', status: 'todo', priority: 'urgent_important', is_urgent: true, is_important: true, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  { id: 'bmn2', project_id: 'bmn', title: 'Convert export coaches into affiliates', status: 'todo', priority: 'urgent_important', is_urgent: true, is_important: true, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  { id: 'bmn3', project_id: 'bmn', title: 'Investment must read', status: 'todo', priority: 'urgent_important', is_urgent: true, is_important: true, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  { id: 'bmn4', project_id: 'bmn', title: 'Term sheet', status: 'todo', priority: 'urgent_important', is_urgent: true, is_important: true, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  { id: 'bmn5', project_id: 'bmn', title: 'ESOP', status: 'todo', priority: 'urgent_important', is_urgent: true, is_important: true, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  
+  // URGENT & NOT IMPORTANT - Delegate (Orange)
+  { id: 'bmn6', project_id: 'bmn', title: 'Email Verifier Tool', description: 'LetsExtract Email Verifier for mailing list validation', status: 'todo', priority: 'urgent_not_important', is_urgent: true, is_important: false, links: ['https://letsextract.com/email-verifier.htm'], created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  { id: 'bmn7', project_id: 'bmn', title: 'For The Interested - Sponsorship Opportunities', description: 'Newsletter advertising for creative entrepreneurs', status: 'todo', priority: 'urgent_not_important', is_urgent: true, is_important: false, links: ['https://fortheinterested.com/ads/'], created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  { id: 'bmn8', project_id: 'bmn', title: 'Startups Seeking Investment Form', description: 'Typeform for investment applications', status: 'todo', priority: 'urgent_not_important', is_urgent: true, is_important: false, links: ['https://9cqs4pw3plw.typeform.com/to/zHNYb0Zb'], created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  
+  // NOT URGENT & IMPORTANT - Schedule (Green)
+  { id: 'bmn9', project_id: 'bmn', title: 'Read about guesstimation PM playbook', status: 'todo', priority: 'not_urgent_important', is_urgent: false, is_important: true, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  { id: 'bmn10', project_id: 'bmn', title: 'High Ticket Clients from LinkedIn Search', description: 'Google Doc guide for client acquisition', status: 'todo', priority: 'not_urgent_important', is_urgent: false, is_important: true, links: ['https://docs.google.com/document/d/1EAuiX-OzLhZRbUe8JDJfcySHbzMMpJ7uHEpWB6odWqE/edit?tab=t.0'], created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  { id: 'bmn11', project_id: 'bmn', title: 'VC Valuation Method Excel Template', description: 'Venture Capital Method for startup valuation', status: 'todo', priority: 'not_urgent_important', is_urgent: false, is_important: true, links: ['https://www.thevccorner.com/p/venture-capital-valuation-method-excel-template'], created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  { id: 'bmn12', project_id: 'bmn', title: 'Anshuman Sinha - Cap Table Dilution', description: 'LinkedIn post about avoiding dilution in startup cap table', status: 'todo', priority: 'not_urgent_important', is_urgent: false, is_important: true, links: ['https://www.linkedin.com/posts/anshumansinha1_startups-entrepreneurship-angelinvesting-activity-7339309661935890433-3QgA'], created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  { id: 'bmn13', project_id: 'bmn', title: 'Anshuman Sinha - SAFE vs Cap Table', description: 'LinkedIn post about $5M cap understanding and dilution impact', status: 'todo', priority: 'not_urgent_important', is_urgent: false, is_important: true, links: ['https://www.linkedin.com/posts/anshumansinha1_startups-entrepreneurship-angelinvesting-activity-7339188533867290626-TBzv'], created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  
+  // NOT URGENT & NOT IMPORTANT - Eliminate (Blue)
+  { id: 'bmn14', project_id: 'bmn', title: 'YouTube Video 1', description: 'Business/marketing related video', status: 'todo', priority: 'not_urgent_not_important', is_urgent: false, is_important: false, links: ['https://www.youtube.com/watch?v=qNh8WnjQbtw'], created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  { id: 'bmn15', project_id: 'bmn', title: 'YouTube Video 2', description: 'Business strategy content', status: 'todo', priority: 'not_urgent_not_important', is_urgent: false, is_important: false, links: ['https://www.youtube.com/watch?v=zNHKAEiyCG0&t=231s'], created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  { id: 'bmn16', project_id: 'bmn', title: 'YouTube Short 1', description: 'Quick business tip', status: 'todo', priority: 'not_urgent_not_important', is_urgent: false, is_important: false, links: ['https://youtube.com/shorts/gaVuF_4y-PM?si=8DmMRY8M2HPme0wj'], created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  { id: 'bmn17', project_id: 'bmn', title: 'YouTube Video 3', description: 'Educational content', status: 'todo', priority: 'not_urgent_not_important', is_urgent: false, is_important: false, links: ['https://www.youtube.com/watch?v=tu501rOVMGc'], created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  { id: 'bmn18', project_id: 'bmn', title: 'YouTube Video 4', description: 'Business insights', status: 'todo', priority: 'not_urgent_not_important', is_urgent: false, is_important: false, links: ['https://www.youtube.com/watch?v=Kr6fWPEe7wM'], created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  { id: 'bmn19', project_id: 'bmn', title: 'YouTube Short 2', description: 'Marketing tip', status: 'todo', priority: 'not_urgent_not_important', is_urgent: false, is_important: false, links: ['https://www.youtube.com/shorts/BHNPabuv3p8'], created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+];
+
+// Empty tasks for CSuite - starting fresh
 const otherTasks: Task[] = [
-  // BMN and CSuite projects start with no tasks - clean slate from Oct 17, 2025
+  // CSuite project starts with no tasks - clean slate from Oct 17, 2025
   // Health project uses workout tracking system instead of task management
   // Journaling project has its own dedicated dashboard
 ];
 
-const mockTasks: Task[] = [...personalTasks, ...otherTasks];
+const mockTasks: Task[] = [...personalTasks, ...bmnTasks, ...otherTasks];
 
 type ViewMode = 'matrix' | 'table' | 'calendar' | 'workout';
 
