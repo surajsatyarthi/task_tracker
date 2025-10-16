@@ -17,28 +17,21 @@ const projects: Project[] = [
   { id: 'journaling', name: 'Journaling', slug: 'journaling', color: '#8b5cf6', is_active: true, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
 ];
 
-// Personal tasks from CSV - Complete list with varied statuses for sorting demo
+// Personal tasks from CSV - ALL set to 'todo' status as requested
 const personalTasks: Task[] = [
-  // TO DO tasks (highest priority in sorting)
   { id: 'p1', project_id: 'personal', title: 'PnL sheet', status: 'todo', priority: 'urgent_important', is_urgent: true, is_important: true, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
   { id: 'p2', project_id: 'personal', title: 'Legal notice to builder indiabulls', status: 'todo', priority: 'urgent_important', is_urgent: true, is_important: true, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
   { id: 'p3', project_id: 'personal', title: 'Company clouser', status: 'todo', priority: 'urgent_not_important', is_urgent: true, is_important: false, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
   { id: 'p4', project_id: 'personal', title: 'Increase card limit sbi', status: 'todo', priority: 'urgent_not_important', is_urgent: true, is_important: false, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
   { id: 'p5', project_id: 'personal', title: 'Workout routine', status: 'todo', priority: 'not_urgent_important', is_urgent: false, is_important: true, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
   { id: 'p6', project_id: 'personal', title: 'Learn SEO and pSEO', status: 'todo', priority: 'not_urgent_important', is_urgent: false, is_important: true, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
-  
-  // DOING tasks
-  { id: 'p7', project_id: 'personal', title: 'Hard disk repair', status: 'doing', priority: 'urgent_not_important', is_urgent: true, is_important: false, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
-  { id: 'p8', project_id: 'personal', title: 'BMI', status: 'doing', priority: 'not_urgent_important', is_urgent: false, is_important: true, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
-  { id: 'p9', project_id: 'personal', title: 'VC Valuation Method Excel Template', description: 'https://www.thevccorner.com/p/venture-capital-valuation-method-excel-template', status: 'doing', priority: 'not_urgent_important', is_urgent: false, is_important: true, links: ['https://www.thevccorner.com/p/venture-capital-valuation-method-excel-template'], created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
-  
-  // ON HOLD tasks
-  { id: 'p10', project_id: 'personal', title: 'Propretiorship account', status: 'on_hold', priority: 'urgent_important', is_urgent: true, is_important: true, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
-  { id: 'p11', project_id: 'personal', title: 'ICICI card limit increase', status: 'on_hold', priority: 'urgent_not_important', is_urgent: true, is_important: false, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
-  
-  // DONE tasks (lowest priority in sorting)
-  { id: 'p12', project_id: 'personal', title: 'SEO Video Tutorial', description: 'https://www.youtube.com/watch?v=lOPIutlDFpA', status: 'done', priority: 'not_urgent_important', is_urgent: false, is_important: true, links: ['https://www.youtube.com/watch?v=lOPIutlDFpA'], created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
-  { id: 'p13', project_id: 'personal', title: 'SEO Writing AI Tool', description: 'https://seowriting.ai/', status: 'done', priority: 'not_urgent_important', is_urgent: false, is_important: true, links: ['https://seowriting.ai/'], created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  { id: 'p7', project_id: 'personal', title: 'Hard disk repair', status: 'todo', priority: 'urgent_not_important', is_urgent: true, is_important: false, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  { id: 'p8', project_id: 'personal', title: 'BMI', status: 'todo', priority: 'not_urgent_important', is_urgent: false, is_important: true, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  { id: 'p9', project_id: 'personal', title: 'VC Valuation Method Excel Template', description: 'https://www.thevccorner.com/p/venture-capital-valuation-method-excel-template', status: 'todo', priority: 'not_urgent_important', is_urgent: false, is_important: true, links: ['https://www.thevccorner.com/p/venture-capital-valuation-method-excel-template'], created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  { id: 'p10', project_id: 'personal', title: 'Propretiorship account', status: 'todo', priority: 'urgent_important', is_urgent: true, is_important: true, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  { id: 'p11', project_id: 'personal', title: 'ICICI card limit increase', status: 'todo', priority: 'urgent_not_important', is_urgent: true, is_important: false, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  { id: 'p12', project_id: 'personal', title: 'SEO Video Tutorial', description: 'https://www.youtube.com/watch?v=lOPIutlDFpA', status: 'todo', priority: 'not_urgent_important', is_urgent: false, is_important: true, links: ['https://www.youtube.com/watch?v=lOPIutlDFpA'], created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  { id: 'p13', project_id: 'personal', title: 'SEO Writing AI Tool', description: 'https://seowriting.ai/', status: 'todo', priority: 'not_urgent_important', is_urgent: false, is_important: true, links: ['https://seowriting.ai/'], created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
   
   // NOT URGENT NOT IMPORTANT tasks
   { id: 'p14', project_id: 'personal', title: 'Sell laptop', status: 'todo', priority: 'not_urgent_not_important', is_urgent: false, is_important: false, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
@@ -52,9 +45,9 @@ const personalTasks: Task[] = [
   { id: 'p21', project_id: 'personal', title: 'Indusind card', status: 'todo', priority: 'not_urgent_not_important', is_urgent: false, is_important: false, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
   { id: 'p22', project_id: 'personal', title: 'Basic Prompts Twitter Thread', description: 'https://x.com/basicprompts/status/1966487017669415400', status: 'todo', priority: 'not_urgent_not_important', is_urgent: false, is_important: false, links: ['https://x.com/basicprompts/status/1966487017669415400'], created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
   { id: 'p23', project_id: 'personal', title: 'Matt Gray Twitter Thread', description: 'https://x.com/matt_gray_/status/1973053054267122067', status: 'todo', priority: 'not_urgent_not_important', is_urgent: false, is_important: false, links: ['https://x.com/matt_gray_/status/1973053054267122067'], created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
-  { id: 'p24', project_id: 'personal', title: 'Julian Goldie SEO Thread 1', description: 'https://x.com/JulianGoldieSEO/status/1976729630666375226', status: 'help_me', priority: 'not_urgent_important', is_urgent: false, is_important: true, links: ['https://x.com/JulianGoldieSEO/status/1976729630666375226'], created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
-  { id: 'p25', project_id: 'personal', title: 'Natia Kourdadze SEO Thread', description: 'https://x.com/natiakourdadze/status/1977064491528450346', status: 'help_me', priority: 'not_urgent_important', is_urgent: false, is_important: true, links: ['https://x.com/natiakourdadze/status/1977064491528450346'], created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
-  { id: 'p26', project_id: 'personal', title: 'Julian Goldie SEO Thread 2', description: 'https://x.com/JulianGoldieSEO/status/1977444094298476979', status: 'done', priority: 'not_urgent_important', is_urgent: false, is_important: true, links: ['https://x.com/JulianGoldieSEO/status/1977444094298476979'], created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  { id: 'p24', project_id: 'personal', title: 'Julian Goldie SEO Thread 1', description: 'https://x.com/JulianGoldieSEO/status/1976729630666375226', status: 'todo', priority: 'not_urgent_important', is_urgent: false, is_important: true, links: ['https://x.com/JulianGoldieSEO/status/1976729630666375226'], created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  { id: 'p25', project_id: 'personal', title: 'Natia Kourdadze SEO Thread', description: 'https://x.com/natiakourdadze/status/1977064491528450346', status: 'todo', priority: 'not_urgent_important', is_urgent: false, is_important: true, links: ['https://x.com/natiakourdadze/status/1977064491528450346'], created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  { id: 'p26', project_id: 'personal', title: 'Julian Goldie SEO Thread 2', description: 'https://x.com/JulianGoldieSEO/status/1977444094298476979', status: 'todo', priority: 'not_urgent_important', is_urgent: false, is_important: true, links: ['https://x.com/JulianGoldieSEO/status/1977444094298476979'], created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
 ];
 
 // Mock data for other projects (no owners - it's just you)
