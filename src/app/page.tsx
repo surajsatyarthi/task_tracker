@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import EisenhowerMatrix from '@/components/EisenhowerMatrix';
 import TaskTable from '@/components/TaskTable';
 import TaskDetailModal from '@/components/TaskDetailModal';
+import AddTaskModal from '@/components/AddTaskModal';
 import { Task, TaskPriority, Project, getFlagsFromPriority } from '@/types/task';
 import { Squares2X2Icon, TableCellsIcon } from '@heroicons/react/24/outline';
 
@@ -56,7 +57,7 @@ const personalTasks: Task[] = [
   { id: 'p26', project_id: 'personal', title: 'Julian Goldie SEO Thread 2', description: 'https://x.com/JulianGoldieSEO/status/1977444094298476979', status: 'done', priority: 'not_urgent_important', is_urgent: false, is_important: true, links: ['https://x.com/JulianGoldieSEO/status/1977444094298476979'], created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
 ];
 
-// Mock data for other projects
+// Mock data for other projects (no owners - it's just you)
 const otherTasks: Task[] = [
   {
     id: '2', 
@@ -66,7 +67,6 @@ const otherTasks: Task[] = [
     priority: 'urgent_important',
     is_urgent: true,
     is_important: true,
-    owner: 'Marketing Team',
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
   },
@@ -78,7 +78,6 @@ const otherTasks: Task[] = [
     priority: 'urgent_important',
     is_urgent: true,
     is_important: true,
-    owner: 'Najib',
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
   },
@@ -137,6 +136,7 @@ export default function Home() {
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [activeProject, setActiveProject] = useState<string>('personal');
   const [viewMode, setViewMode] = useState<ViewMode>('matrix');
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
   const handleTaskMove = (taskId: string, newPriority: TaskPriority) => {
     setTasks(prevTasks => 
@@ -178,6 +178,17 @@ export default function Home() {
     );
   };
 
+  const handleAddTask = (newTaskData: Omit<Task, 'id' | 'created_at' | 'updated_at'>) => {
+    const newTask: Task = {
+      ...newTaskData,
+      id: `task_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    };
+    
+    setTasks(prevTasks => [...prevTasks, newTask]);
+  };
+
   const filteredTasks = tasks.filter(task => task.project_id === activeProject);
   const currentProject = projects.find(p => p.id === activeProject);
 
@@ -196,7 +207,10 @@ export default function Home() {
               </p>
             </div>
             <div className="flex items-center gap-2 sm:gap-4">
-              <button className="bg-green-600 text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-green-700 transition-colors text-sm sm:text-base">
+              <button 
+                onClick={() => setIsAddModalOpen(true)}
+                className="bg-green-600 text-white px-3 sm:px-4 py-2 rounded-lg hover:bg-green-700 transition-colors text-sm sm:text-base"
+              >
                 Add Task
               </button>
             </div>
@@ -305,7 +319,6 @@ export default function Home() {
             <TaskTable 
               tasks={filteredTasks}
               onTaskClick={handleTaskClick}
-              projectId={activeProject}
             />
           )}
         </div>
@@ -317,6 +330,14 @@ export default function Home() {
         isOpen={!!selectedTask}
         onClose={() => setSelectedTask(null)}
         onUpdate={handleTaskUpdate}
+      />
+      
+      {/* Add Task Modal */}
+      <AddTaskModal
+        isOpen={isAddModalOpen}
+        onClose={() => setIsAddModalOpen(false)}
+        onAdd={handleAddTask}
+        currentProject={activeProject}
       />
     </div>
   );
