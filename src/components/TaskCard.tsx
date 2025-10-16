@@ -8,9 +8,10 @@ interface TaskCardProps {
   task: Task;
   isDragging?: boolean;
   onClick?: () => void;
+  onEdit?: () => void;
 }
 
-const TaskCard: React.FC<TaskCardProps> = ({ task, isDragging = false, onClick }) => {
+const TaskCard: React.FC<TaskCardProps> = ({ task, isDragging = false, onClick, onEdit }) => {
   const statusStyle = statusConfig[task.status];
   const isOverdue = isTaskOverdue(task);
 
@@ -117,16 +118,18 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, isDragging = false, onClick }
         </div>
       )}
 
-      {/* Drag Handle Indicator */}
-      {!isDragging && (
-        <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
-          <div className="flex flex-col gap-0.5">
-            <div className="w-1 h-1 bg-gray-400 rounded-full"></div>
-            <div className="w-1 h-1 bg-gray-400 rounded-full"></div>
-            <div className="w-1 h-1 bg-gray-400 rounded-full"></div>
-          </div>
-        </div>
-      )}
+      {/* Edit Tab at Bottom */}
+      <div className="mt-3 pt-2 border-t border-gray-100">
+        <button 
+          onClick={(e) => {
+            e.stopPropagation();
+            onEdit?.();
+          }}
+          className="w-full text-xs text-gray-500 hover:text-blue-600 transition-colors py-1"
+        >
+          Edit
+        </button>
+      </div>
     </div>
   );
 };
