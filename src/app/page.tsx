@@ -128,6 +128,12 @@ const csuiteTasks: Task[] = [
   { id: 'cs28', project_id: 'csuite', title: 'Julian Goldie SEO Twitter Thread', description: 'SEO insights and tips', status: 'todo', priority: 'not_urgent_not_important', is_urgent: false, is_important: false, links: ['https://x.com/JulianGoldieSEO/status/1932180908087324844'], created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
   { id: 'cs29', project_id: 'csuite', title: 'Natia Kourdadze Twitter Profile', description: 'SEO expert insights and content', status: 'todo', priority: 'not_urgent_not_important', is_urgent: false, is_important: false, links: ['https://x.com/natiakourdadze'], created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
   { id: 'cs30', project_id: 'csuite', title: 'YouTube Tutorial Video', description: 'Business process tutorial', status: 'todo', priority: 'not_urgent_not_important', is_urgent: false, is_important: false, links: ['https://youtu.be/IhEy5s-Z_Jg?si=ejIDAGyjsCBzIOwb'], created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  // New tasks
+  { id: 'cs31', project_id: 'csuite', title: 'Template for Raquel', status: 'todo', priority: 'not_urgent_important', is_urgent: false, is_important: true, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  { id: 'cs32', project_id: 'csuite', title: 'Graduation email to all 3 consultants', status: 'todo', priority: 'urgent_important', is_urgent: true, is_important: true, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  { id: 'cs33', project_id: 'csuite', title: 'Vietnam hiring', status: 'todo', priority: 'urgent_important', is_urgent: true, is_important: true, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  { id: 'cs34', project_id: 'csuite', title: 'pSEO articles', status: 'todo', priority: 'not_urgent_important', is_urgent: false, is_important: true, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
+  { id: 'cs35', project_id: 'csuite', title: 'Manyreach setup', status: 'todo', priority: 'urgent_not_important', is_urgent: true, is_important: false, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
 ];
 
 // Empty tasks placeholder
