@@ -695,28 +695,21 @@ const HealthDashboard: React.FC<HealthDashboardProps> = ({ onWorkoutUpdate }) =>
                       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3">
                         {weekData.days.map((weight) => {
                           const dayNum = parseInt(weight.date.split('-')[2]);
-                          const isWeekend = new Date(weight.date).getDay() === 0 || new Date(weight.date).getDay() === 6;
                           const isToday = weight.date === new Date().toISOString().split('T')[0];
                           
                           return (
                             <div key={weight.date} className={`flex items-center justify-between p-3 rounded-lg border transition-all hover:shadow-md ${
                               isToday 
                                 ? 'bg-yellow-50 border-yellow-300 shadow-md' 
-                                : isWeekend 
-                                ? 'bg-blue-50 border-blue-200' 
                                 : 'bg-gray-50 border-gray-200 hover:bg-gray-100'
                             }`}>
                               <div className="flex-1 min-w-0">
-                                <div className={`font-medium text-sm flex items-center gap-2 ${
+                                <div className={`font-medium text-sm ${
                                   isToday ? 'text-yellow-800' : 'text-gray-900'
                                 }`}>
-                                  <span>Oct {dayNum}</span>
-                                  {isWeekend && <span className="text-xs text-blue-600">📅</span>}
-                                  {isToday && <span className="text-xs font-bold">TODAY</span>}
+                                  Oct {dayNum}
+                                  {isToday && <span className="text-xs font-bold ml-2">TODAY</span>}
                                 </div>
-                                {weight.notes && (
-                                  <div className="text-xs text-gray-500 truncate mt-1">{weight.notes}</div>
-                                )}
                               </div>
                               <div className={`text-lg font-bold ml-2 ${
                                 isToday ? 'text-yellow-700' : 'text-blue-600'
