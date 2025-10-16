@@ -52,74 +52,11 @@ const personalTasks: Task[] = [
   { id: 'p26', project_id: 'personal', title: 'Julian Goldie SEO Thread 2', description: 'https://x.com/JulianGoldieSEO/status/1977444094298476979', status: 'todo', priority: 'not_urgent_important', is_urgent: false, is_important: true, links: ['https://x.com/JulianGoldieSEO/status/1977444094298476979'], created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
 ];
 
-// Mock data for other projects (no owners - it's just you)
+// Empty tasks for BMN and CSuite - starting fresh
 const otherTasks: Task[] = [
-  {
-    id: '2', 
-    project_id: 'bmn',
-    title: 'Newsletter emails sent',
-    status: 'doing',
-    priority: 'urgent_important',
-    is_urgent: true,
-    is_important: true,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-  {
-    id: '3',
-    project_id: 'csuite',
-    title: 'LinkedIn Banner',
-    status: 'done',
-    priority: 'urgent_important',
-    is_urgent: true,
-    is_important: true,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-  {
-    id: '5',
-    project_id: 'health',
-    title: 'Schedule annual checkup',
-    status: 'todo',
-    priority: 'not_urgent_important',
-    is_urgent: false,
-    is_important: true,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-  {
-    id: '6',
-    project_id: 'health',
-    title: 'Take vitamins',
-    status: 'doing',
-    priority: 'urgent_not_important',
-    is_urgent: true,
-    is_important: false,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-  {
-    id: '7',
-    project_id: 'journaling',
-    title: 'Morning reflection',
-    status: 'done',
-    priority: 'not_urgent_important',
-    is_urgent: false,
-    is_important: true,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
-  {
-    id: '8',
-    project_id: 'journaling',
-    title: 'Weekly review',
-    status: 'todo',
-    priority: 'not_urgent_important',
-    is_urgent: false,
-    is_important: true,
-    created_at: new Date().toISOString(),
-    updated_at: new Date().toISOString(),
-  },
+  // BMN and CSuite projects start with no tasks - clean slate from Oct 17, 2025
+  // Health project uses workout tracking system instead of task management
+  // Journaling project has its own dedicated dashboard
 ];
 
 const mockTasks: Task[] = [...personalTasks, ...otherTasks];

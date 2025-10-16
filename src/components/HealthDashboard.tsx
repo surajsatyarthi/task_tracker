@@ -61,39 +61,8 @@ const HealthDashboard: React.FC<HealthDashboardProps> = ({ onWorkoutUpdate }) =>
     setCurrentWorkout(todayWorkout || weeks[0]?.days[0] || null);
     setSelectedDate(todayWorkout?.date || new Date().toISOString().split('T')[0]);
 
-    // Load comprehensive sample weight data for October 2025
-    setDailyWeights([
-      { date: '2025-10-01', weight: 78.2, notes: 'Starting weight' },
-      { date: '2025-10-02', weight: 78.0, notes: 'Day 2 check-in' },
-      { date: '2025-10-03', weight: 77.9, notes: 'Morning weight' },
-      { date: '2025-10-04', weight: 77.7, notes: 'Post workout Friday' },
-      { date: '2025-10-05', weight: 77.6, notes: 'After workout' },
-      { date: '2025-10-06', weight: 77.8, notes: 'Sunday rest day' },
-      { date: '2025-10-07', weight: 77.8, notes: 'Weekend weight' },
-      { date: '2025-10-08', weight: 77.5, notes: 'Back to routine' },
-      { date: '2025-10-09', weight: 77.4, notes: 'Morning weight' },
-      { date: '2025-10-10', weight: 77.2, notes: 'Mid-week progress' },
-      { date: '2025-10-11', weight: 77.1, notes: 'Post cardio' },
-      { date: '2025-10-12', weight: 77.0, notes: 'Consistency paying off' },
-      { date: '2025-10-13', weight: 76.9, notes: 'Morning weight' },
-      { date: '2025-10-14', weight: 76.8, notes: 'Steady decline' },
-      { date: '2025-10-15', weight: 76.6, notes: 'Great progress!' },
-      { date: '2025-10-16', weight: 76.5, notes: 'New personal low' },
-      { date: '2025-10-17', weight: 76.4, notes: 'Workout program start' },
-      { date: '2025-10-18', weight: 76.3, notes: 'Building momentum' },
-      { date: '2025-10-19', weight: 76.2, notes: 'Weekend consistency' },
-      { date: '2025-10-20', weight: 76.4, notes: 'Small fluctuation' },
-      { date: '2025-10-21', weight: 76.1, notes: 'Back on track' },
-      { date: '2025-10-22', weight: 76.0, notes: 'Breakthrough!' },
-      { date: '2025-10-23', weight: 75.9, notes: 'Almost at 75kg' },
-      { date: '2025-10-24', weight: 75.8, notes: 'Feeling strong' },
-      { date: '2025-10-25', weight: 75.7, notes: 'Consistent progress' },
-      { date: '2025-10-26', weight: 75.6, notes: 'Weekend maintenance' },
-      { date: '2025-10-27', weight: 75.5, notes: 'New milestone' },
-      { date: '2025-10-28', weight: 75.4, notes: 'End of month push' },
-      { date: '2025-10-29', weight: 75.3, notes: 'Almost there' },
-      { date: '2025-10-30', weight: 75.2, notes: 'October finale' },
-    ]);
+    // Start with empty weight data - user will track from Oct 17, 2025 onwards
+    setDailyWeights([]);
   }, []);
 
   const handleDateSelect = (date: string) => {
@@ -232,7 +201,7 @@ const HealthDashboard: React.FC<HealthDashboardProps> = ({ onWorkoutUpdate }) =>
       {/* Header */}
       <div className="text-center">
         <h2 className="text-3xl font-bold text-gray-900 mb-2">Health & Fitness Dashboard</h2>
-        <p className="text-gray-600">Track workouts, weight, and progress starting October 17, 2025</p>
+        <p className="text-gray-600">Your fitness journey begins October 17, 2025 (Friday) - Ready to transform?</p>
       </div>
 
       {/* Navigation Tabs */}
@@ -602,48 +571,58 @@ const HealthDashboard: React.FC<HealthDashboardProps> = ({ onWorkoutUpdate }) =>
           <div className="bg-white rounded-xl p-6 border border-gray-200">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold text-gray-900">
-                Weight History - October 2025
+                Weight History - Starting October 17, 2025
               </h3>
               <div className="text-sm text-gray-600 bg-blue-50 px-3 py-1 rounded-full">
                 {dailyWeights.length} daily records
               </div>
             </div>
             
-            {/* Weight Summary Stats */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6 p-4 bg-gradient-to-r from-blue-50 to-green-50 rounded-lg">
-              <div className="text-center">
-                <div className="text-xl font-bold text-green-600">
-                  {Math.max(...dailyWeights.map(w => w.weight))}kg
+            {/* Weight Summary Stats - Only show if we have data */}
+            {dailyWeights.length > 0 && (
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6 p-4 bg-gradient-to-r from-blue-50 to-green-50 rounded-lg">
+                <div className="text-center">
+                  <div className="text-xl font-bold text-green-600">
+                    {Math.max(...dailyWeights.map(w => w.weight))}kg
+                  </div>
+                  <div className="text-xs text-gray-600">Highest</div>
+                  <div className="text-xs text-gray-500">recorded</div>
                 </div>
-                <div className="text-xs text-gray-600">Month High</div>
-                <div className="text-xs text-gray-500">Oct 1st</div>
-              </div>
-              <div className="text-center">
-                <div className="text-xl font-bold text-blue-600">
-                  {Math.min(...dailyWeights.map(w => w.weight))}kg
+                <div className="text-center">
+                  <div className="text-xl font-bold text-blue-600">
+                    {Math.min(...dailyWeights.map(w => w.weight))}kg
+                  </div>
+                  <div className="text-xs text-gray-600">Lowest</div>
+                  <div className="text-xs text-gray-500">recorded</div>
                 </div>
-                <div className="text-xs text-gray-600">Month Low</div>
-                <div className="text-xs text-gray-500">Oct 30th</div>
-              </div>
-              <div className="text-center">
-                <div className="text-xl font-bold text-purple-600">
-                  -{(Math.max(...dailyWeights.map(w => w.weight)) - Math.min(...dailyWeights.map(w => w.weight))).toFixed(1)}kg
+                <div className="text-center">
+                  <div className="text-xl font-bold text-purple-600">
+                    -{(Math.max(...dailyWeights.map(w => w.weight)) - Math.min(...dailyWeights.map(w => w.weight))).toFixed(1)}kg
+                  </div>
+                  <div className="text-xs text-gray-600">Total Loss</div>
+                  <div className="text-xs text-gray-500">{dailyWeights.length} days</div>
                 </div>
-                <div className="text-xs text-gray-600">Total Loss</div>
-                <div className="text-xs text-gray-500">30 days</div>
-              </div>
-              <div className="text-center">
-                <div className="text-xl font-bold text-orange-600">
-                  -{((Math.max(...dailyWeights.map(w => w.weight)) - Math.min(...dailyWeights.map(w => w.weight))) / 30 * 7).toFixed(1)}kg
+                <div className="text-center">
+                  <div className="text-xl font-bold text-orange-600">
+                    -{dailyWeights.length >= 7 ? ((Math.max(...dailyWeights.map(w => w.weight)) - Math.min(...dailyWeights.map(w => w.weight))) / dailyWeights.length * 7).toFixed(1) : '0.0'}kg
+                  </div>
+                  <div className="text-xs text-gray-600">Weekly Avg</div>
+                  <div className="text-xs text-gray-500">rate</div>
                 </div>
-                <div className="text-xs text-gray-600">Weekly Avg</div>
-                <div className="text-xs text-gray-500">rate</div>
               </div>
-            </div>
+            )}
             
             {dailyWeights.length === 0 ? (
-              <div className="text-center py-8 text-gray-500">
-                No weight records yet. Start by recording your daily weight above.
+              <div className="text-center py-12 text-gray-500">
+                <ScaleIcon className="w-16 h-16 mx-auto text-gray-300 mb-4" />
+                <h4 className="text-lg font-medium text-gray-900 mb-2">Ready to Start Your Journey?</h4>
+                <p className="text-gray-600 mb-4">
+                  Your fitness tracking begins October 17, 2025 (Friday)<br/>
+                  Record your daily weight above to see progress charts and statistics.
+                </p>
+                <div className="text-sm text-blue-600 bg-blue-50 px-4 py-2 rounded-lg inline-block">
+                  💡 Tip: Weigh yourself at the same time each day for consistency
+                </div>
               </div>
             ) : weightView === 'table' ? (
               /* Enhanced Table View - Show all 30 days */
