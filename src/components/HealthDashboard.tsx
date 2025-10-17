@@ -869,7 +869,7 @@ const HealthDashboard: React.FC<HealthDashboardProps> = ({ onWorkoutUpdate }) =>
 
           {/* Yearly Stats */}
           <div className="bg-white rounded-xl p-6 border border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">2025 Annual Progress</h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">2025-26 Fitness Year Progress</h3>
             
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
               <div className="text-center">

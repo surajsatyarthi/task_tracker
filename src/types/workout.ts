@@ -413,7 +413,8 @@ export const WORKOUT_PLAN: WorkoutTemplate[] = [
 export const generateWorkoutWeeks = (): WorkoutWeek[] => {
   const weeks: WorkoutWeek[] = [];
   const startDate = new Date('2025-10-17'); // First workout day (Friday)
-  const weeksToGenerate = 52; // 1 year
+  const endDate = new Date('2026-10-16'); // End date (1 year from start)
+  const totalDays = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)) + 1; // +1 to include end date
   
   // Calculate which day of the week Oct 17 falls on (0=Sunday, 1=Monday, etc.)
   // const startDayOfWeek = startDate.getDay(); // Friday = 5 (unused for now)
@@ -421,7 +422,7 @@ export const generateWorkoutWeeks = (): WorkoutWeek[] => {
   // Create continuous daily workouts starting from Oct 17
   const allWorkoutDays: WorkoutDay[] = [];
   
-  for (let dayCount = 0; dayCount < weeksToGenerate * 7; dayCount++) {
+  for (let dayCount = 0; dayCount < totalDays; dayCount++) {
     const currentDate = new Date(startDate);
     currentDate.setDate(startDate.getDate() + dayCount);
     
@@ -448,8 +449,9 @@ export const generateWorkoutWeeks = (): WorkoutWeek[] => {
   
   // Group workout days into weeks (Monday to Sunday)
   const currentWeekStart = new Date('2025-10-13'); // Monday of week containing Oct 17
+  const totalWeeks = Math.ceil(totalDays / 7) + 2; // Extra weeks to ensure coverage
   
-  for (let weekIndex = 0; weekIndex < weeksToGenerate; weekIndex++) {
+  for (let weekIndex = 0; weekIndex < totalWeeks; weekIndex++) {
     const weekStart = new Date(currentWeekStart);
     weekStart.setDate(currentWeekStart.getDate() + (weekIndex * 7));
     
@@ -526,7 +528,12 @@ export const formatDate = (dateString: string): string => {
 
 export const calculateMonthlyStats = (workoutWeeks: WorkoutWeek[], month: string): MonthlyStats => {
   const monthWorkouts = workoutWeeks.flatMap(week => 
-    week.days.filter(day => day.date.startsWith(month))
+    week.days.filter(day => {
+      const dayDate = new Date(day.date);
+      const startDate = new Date('2025-10-17');
+      const endDate = new Date('2026-10-16');
+      return day.date.startsWith(month) && dayDate >= startDate && dayDate <= endDate;
+    })
   );
   
   const totalWorkouts = monthWorkouts.length;
@@ -534,7 +541,9 @@ export const calculateMonthlyStats = (workoutWeeks: WorkoutWeek[], month: string
   const missedWorkouts = monthWorkouts.filter(day => {
     const dayDate = new Date(day.date);
     const today = new Date();
-    return dayDate < today && !day.completed;
+    const startDate = new Date('2025-10-17');
+    // Only count as missed if the date is past today AND after the start date
+    return dayDate < today && dayDate >= startDate && !day.completed;
   }).length;
   
   return {
@@ -547,9 +556,14 @@ export const calculateMonthlyStats = (workoutWeeks: WorkoutWeek[], month: string
 };
 
 export const calculateYearlyStats = (workoutWeeks: WorkoutWeek[], year: number): YearlyStats => {
-  const yearStr = year.toString();
+  // For our fitness year (Oct 2025 - Oct 2026), include both years
   const yearWorkouts = workoutWeeks.flatMap(week => 
-    week.days.filter(day => day.date.startsWith(yearStr))
+    week.days.filter(day => {
+      const dayDate = new Date(day.date);
+      const startDate = new Date('2025-10-17');
+      const endDate = new Date('2026-10-16');
+      return dayDate >= startDate && dayDate <= endDate;
+    })
   );
   
   const totalWorkouts = yearWorkouts.length;
@@ -557,7 +571,9 @@ export const calculateYearlyStats = (workoutWeeks: WorkoutWeek[], year: number):
   const missedWorkouts = yearWorkouts.filter(day => {
     const dayDate = new Date(day.date);
     const today = new Date();
-    return dayDate < today && !day.completed;
+    const startDate = new Date('2025-10-17');
+    // Only count as missed if the date is past today AND after the start date
+    return dayDate < today && dayDate >= startDate && !day.completed;
   }).length;
   
   // Generate monthly breakdown
