@@ -6,8 +6,8 @@
 ```sql
 projects {
   id: string (primary key)
-  name: string (e.g., "Personal", "BMN", "CSuite")
-  slug: string (e.g., "personal", "bmn", "csuite")
+  name: string (e.g., "Personal", "CSuite", "Health", "Journaling", "LinkedIn")
+  slug: string (e.g., "personal", "csuite", "health", "journaling", "linkedin")
   description: string
   color: string (hex color for UI)
   is_active: boolean
@@ -98,8 +98,10 @@ csv_imports {
 ```json
 [
   { "id": "p1", "name": "Personal", "slug": "personal", "color": "#6366f1" },
-  { "id": "p2", "name": "BMN", "slug": "bmn", "color": "#10b981" },
-  { "id": "p3", "name": "CSuite", "slug": "csuite", "color": "#dc2626" }
+  { "id": "p2", "name": "CSuite", "slug": "csuite", "color": "#dc2626" },
+  { "id": "p3", "name": "Health", "slug": "health", "color": "#059669" },
+  { "id": "p4", "name": "Journaling", "slug": "journaling", "color": "#7c3aed" },
+  { "id": "p5", "name": "LinkedIn", "slug": "linkedin", "color": "#0a66c2" }
 ]
 ```
 

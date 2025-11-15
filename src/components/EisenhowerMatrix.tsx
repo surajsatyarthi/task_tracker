@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
-import { Task, TaskPriority, sortTasksForMatrix } from '@/types/task';
+import { Task, TaskPriority, sortTasksForMatrix, priorityConfig } from '@/types/task';
 import TaskCard from './TaskCard';
 
 interface EisenhowerMatrixProps {
@@ -11,34 +11,34 @@ interface EisenhowerMatrixProps {
   onTaskClick: (task: Task) => void;
 }
 
-const priorityConfig = {
+const matrixConfig = {
   urgent_important: {
     title: 'Do First',
     description: 'Urgent & Important',
     color: 'bg-red-50 border-red-200',
     headerColor: 'bg-red-500 text-white',
-    icon: '🚨',
+    ...priorityConfig.urgent_important,
   },
   urgent_not_important: {
     title: 'Delegate',
     description: 'Urgent & Not Important', 
     color: 'bg-orange-50 border-orange-200',
     headerColor: 'bg-orange-500 text-white',
-    icon: '⏰',
+    ...priorityConfig.urgent_not_important,
   },
   not_urgent_important: {
     title: 'Schedule',
     description: 'Not Urgent & Important',
     color: 'bg-green-50 border-green-200',
     headerColor: 'bg-green-500 text-white',
-    icon: '📅',
+    ...priorityConfig.not_urgent_important,
   },
   not_urgent_not_important: {
     title: 'Eliminate',
     description: 'Not Urgent & Not Important',
     color: 'bg-blue-50 border-blue-200',
     headerColor: 'bg-blue-500 text-white',
-    icon: '🗑️',
+    ...priorityConfig.not_urgent_not_important,
   },
 };
 

@@ -2,7 +2,8 @@
 
 import React, { useState } from 'react';
 import { Task, TaskStatus, statusConfig, getTodayDate } from '@/types/task';
-import { XMarkIcon, LinkIcon } from '@heroicons/react/24/outline';
+import { XMarkIcon } from '@heroicons/react/24/outline';
+import LinkPreview from './LinkPreview';
 
 interface TaskDetailModalProps {
   task: Task | null;
@@ -199,16 +200,11 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ task, isOpen, onClose
               <label className="block text-sm font-bold text-gray-900 mb-2">Links</label>
               <div className="space-y-2">
                 {currentTask.links.map((link, index) => (
-                  <a
+                  <LinkPreview
                     key={index}
-                    href={link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-2 text-blue-700 hover:text-blue-900 hover:underline break-all font-medium"
-                  >
-                    <LinkIcon className="w-4 h-4 flex-shrink-0" />
-                    {link}
-                  </a>
+                    url={link}
+                    className="w-full"
+                  />
                 ))}
               </div>
             </div>

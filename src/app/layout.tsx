@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Lato, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
+import { AuthProvider } from "@/contexts/AuthContext";
 
 const lato = Lato({
   variable: "--font-lato",
@@ -31,9 +32,11 @@ export default function RootLayout({
         className={`${lato.variable} ${jetbrainsMono.variable} font-sans antialiased bg-gradient-to-br from-slate-50 to-gray-100`}
         style={{ fontFamily: 'var(--font-lato), sans-serif' }}
       >
-        <div className="min-h-screen">
-          {children}
-        </div>
+        <AuthProvider>
+          <div className="min-h-screen">
+            {children}
+          </div>
+        </AuthProvider>
       </body>
     </html>
   );

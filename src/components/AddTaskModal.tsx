@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Task, TaskPriority, getFlagsFromPriority, getTodayDate } from '@/types/task';
+import { Task, TaskPriority, getFlagsFromPriority, getTodayDate, priorityConfig } from '@/types/task';
 import { XMarkIcon, PlusIcon } from '@heroicons/react/24/outline';
 
 interface AddTaskModalProps {
@@ -11,17 +11,9 @@ interface AddTaskModalProps {
   currentProject: string;
 }
 
-const priorityConfig = {
-  urgent_important: { label: 'Do First', color: 'bg-red-100 text-red-800', icon: '🚨' },
-  urgent_not_important: { label: 'Delegate', color: 'bg-orange-100 text-orange-800', icon: '⏰' },
-  not_urgent_important: { label: 'Schedule', color: 'bg-green-100 text-green-800', icon: '📅' },
-  not_urgent_not_important: { label: 'Eliminate', color: 'bg-blue-100 text-blue-800', icon: '🗑️' },
-};
-
 // Available projects for task creation
 const AVAILABLE_PROJECTS = [
   { id: 'personal', name: 'Personal', color: '#6366f1' },
-  { id: 'bmn', name: 'BMN', color: '#10b981' },
   { id: 'csuite', name: 'CSuite', color: '#dc2626' },
 ];
 

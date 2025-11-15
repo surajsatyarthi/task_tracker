@@ -33,7 +33,7 @@
 - **Mobile Optimized**: Both views work perfectly on mobile
 
 ### 🏢 **Multi-Project Organization**
-- **5 Projects**: Personal, BMN, CSuite, Health, Journaling
+- **5 Projects**: Personal, CSuite, Health, Journaling, LinkedIn
 - **Project Tabs**: Color-coded navigation with visual indicators
 - **Isolated Tasks**: Each project shows only relevant tasks
 - **No Owners**: Simplified for personal use (it's just you)
@@ -160,7 +160,7 @@ src/
 ## 🎯 **USAGE WORKFLOW**
 
 ### ✅ **Current User Journey**
-1. **Open App** → Select project (Personal/BMN/CSuite/Health/Journaling)
+1. **Open App** → Select project (Personal/CSuite/Health/Journaling/LinkedIn)
 2. **View Tasks** → Toggle between Matrix/Table view
 3. **Add Tasks** → Click "Add Task" → Fill form → Auto-assigned as "To Do"
 4. **Manage Tasks** → Click any task → Edit details or change status

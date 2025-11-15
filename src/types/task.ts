@@ -100,6 +100,28 @@ export const statusConfig = {
   help_me: { label: 'Help Needed', color: 'bg-purple-100 text-purple-800', icon: '🆘' },
 };
 
+export const priorityConfig = {
+  urgent_important: { label: 'Do First', color: 'bg-red-100 text-red-800', icon: '🚨' },
+  urgent_not_important: { label: 'Delegate', color: 'bg-orange-100 text-orange-800', icon: '⏰' },
+  not_urgent_important: { label: 'Schedule', color: 'bg-green-100 text-green-800', icon: '📅' },
+  not_urgent_not_important: { label: 'Eliminate', color: 'bg-blue-100 text-blue-800', icon: '🗑️' },
+};
+
+export const priorityColorMap = {
+  urgent_important: 'bg-red-500',
+  urgent_not_important: 'bg-orange-500',
+  not_urgent_important: 'bg-green-500',
+  not_urgent_not_important: 'bg-blue-500',
+};
+
+export const statusIconMap = {
+  done: '✅',
+  doing: '🔄',
+  on_hold: '⏸️',
+  help_me: '🆘',
+  todo: '📝',
+};
+
 // Task sorting utilities
 const statusOrder: Record<TaskStatus, number> = {
   'todo': 1,

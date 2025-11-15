@@ -1,8 +1,8 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
-import { Task } from '@/types/task';
-import { ChevronLeftIcon, ChevronRightIcon, CalendarIcon, ClockIcon } from '@heroicons/react/24/outline';
+import React, { useMemo } from 'react';
+import { Task, priorityColorMap, statusIconMap } from '@/types/task';
+import { CalendarIcon, ClockIcon } from '@heroicons/react/24/outline';
 import { CheckCircleIcon, ExclamationCircleIcon } from '@heroicons/react/24/solid';
 
 interface CalendarViewProps {
@@ -19,71 +19,73 @@ interface CalendarDay {
 }
 
 const CalendarView: React.FC<CalendarViewProps> = ({ tasks, onTaskClick }) => {
-  const [currentDate, setCurrentDate] = useState(new Date());
+  // Fixed date range: November 16, 2025 to November 16, 2026 (1 full year)
+  const START_DATE = new Date('2025-11-16');
+  const END_DATE = new Date('2026-11-16');
 
-  const { calendarDays, monthYear } = useMemo(() => {
-    const year = currentDate.getFullYear();
-    const month = currentDate.getMonth();
-    
-    // Get first day of the month and last day
-    const firstDay = new Date(year, month, 1);
-    const lastDay = new Date(year, month + 1, 0);
-    
-    // Get first day of the week containing the first day of month
-    const startDate = new Date(firstDay);
-    startDate.setDate(startDate.getDate() - startDate.getDay());
-    
-    // Get last day of the week containing the last day of month
-    const endDate = new Date(lastDay);
-    endDate.setDate(endDate.getDate() + (6 - endDate.getDay()));
-    
+  const { calendarDays, dateRange, monthHeaders } = useMemo(() => {
+    // Generate all days from START_DATE to END_DATE
     const days: CalendarDay[] = [];
+    const headers: { index: number; month: string }[] = [];
     const today = new Date().toISOString().split('T')[0];
     
+    // Start from the Sunday of the week containing START_DATE
+    const startWeek = new Date(START_DATE);
+    startWeek.setDate(startWeek.getDate() - startWeek.getDay());
+    
+    // End on the Saturday of the week containing END_DATE
+    const endWeek = new Date(END_DATE);
+    endWeek.setDate(endWeek.getDate() + (6 - endWeek.getDay()));
+    
+    let currentMonth = -1;
+    let dayIndex = 0;
+    
     // Generate all calendar days
-    for (let date = new Date(startDate); date <= endDate; date.setDate(date.getDate() + 1)) {
+    for (let date = new Date(startWeek); date <= endWeek; date.setDate(date.getDate() + 1)) {
       const dateStr = date.toISOString().split('T')[0];
       const dayTasks = tasks.filter(task => task.due_date === dateStr);
+      
+      // Check if date is within our 3-month range
+      const isInRange = date >= START_DATE && date <= END_DATE;
+      
+      // Add month header when month changes
+      if (date.getMonth() !== currentMonth && isInRange) {
+        currentMonth = date.getMonth();
+        headers.push({
+          index: dayIndex,
+          month: date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
+        });
+      }
       
       days.push({
         date: dateStr,
         day: date.getDate(),
-        isCurrentMonth: date.getMonth() === month,
+        isCurrentMonth: isInRange, // Only highlight dates within range
         isToday: dateStr === today,
         tasks: dayTasks
       });
+      
+      dayIndex++;
     }
     
     return {
       calendarDays: days,
-      monthYear: firstDay.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
+      monthHeaders: headers,
+      dateRange: `${START_DATE.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })} - ${END_DATE.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}`
     };
-  }, [currentDate, tasks]);
+  }, [tasks, START_DATE, END_DATE]);
 
-  const navigateMonth = (direction: 'prev' | 'next') => {
-    setCurrentDate(prevDate => {
-      const newDate = new Date(prevDate);
-      if (direction === 'prev') {
-        newDate.setMonth(newDate.getMonth() - 1);
-      } else {
-        newDate.setMonth(newDate.getMonth() + 1);
-      }
-      return newDate;
-    });
-  };
-
-  const goToToday = () => {
-    setCurrentDate(new Date());
+  // Remove monthly navigation since we have a fixed 1-year range
+  const goToStart = () => {
+    // Scroll to the beginning of the calendar
+    const calendarElement = document.querySelector('.calendar-grid-container');
+    if (calendarElement) {
+      calendarElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
   };
 
   const getPriorityColor = (priority: string) => {
-    switch (priority) {
-      case 'urgent_important': return 'bg-red-500';
-      case 'urgent_not_important': return 'bg-orange-500';
-      case 'not_urgent_important': return 'bg-green-500';
-      case 'not_urgent_not_important': return 'bg-blue-500';
-      default: return 'bg-gray-500';
-    }
+    return priorityColorMap[priority as keyof typeof priorityColorMap] || 'bg-gray-500';
   };
 
   const getStatusIcon = (status: string) => {
@@ -97,11 +99,10 @@ const CalendarView: React.FC<CalendarViewProps> = ({ tasks, onTaskClick }) => {
   };
 
   const tasksWithDueDates = tasks.filter(task => task.due_date).length;
-  const tasksThisMonth = tasks.filter(task => {
+  const tasksInRange = tasks.filter(task => {
     if (!task.due_date) return false;
     const taskDate = new Date(task.due_date);
-    return taskDate.getMonth() === currentDate.getMonth() && 
-           taskDate.getFullYear() === currentDate.getFullYear();
+    return taskDate >= START_DATE && taskDate <= END_DATE;
   }).length;
 
   return (
@@ -110,91 +111,92 @@ const CalendarView: React.FC<CalendarViewProps> = ({ tasks, onTaskClick }) => {
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
         <div className="flex items-center justify-between mb-4">
           <div>
-            <h3 className="text-xl font-bold text-gray-900">{monthYear}</h3>
+            <h3 className="text-xl font-bold text-gray-900">{dateRange}</h3>
             <p className="text-gray-600 text-sm">
-              {tasksThisMonth} tasks this month • {tasksWithDueDates} tasks with due dates
+              {tasksInRange} tasks in date range • {tasksWithDueDates} tasks with due dates
             </p>
           </div>
           <div className="flex items-center gap-2">
             <button
-              onClick={goToToday}
+              onClick={goToStart}
               className="px-3 py-2 text-sm font-medium text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-md transition-colors"
             >
-              Today
-            </button>
-            <button
-              onClick={() => navigateMonth('prev')}
-              className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
-            >
-              <ChevronLeftIcon className="w-5 h-5" />
-            </button>
-            <button
-              onClick={() => navigateMonth('next')}
-              className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
-            >
-              <ChevronRightIcon className="w-5 h-5" />
+              Go to Start
             </button>
           </div>
         </div>
 
         {/* Calendar Grid */}
-        <div className="grid grid-cols-7 gap-1">
-          {/* Day headers */}
-          {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
-            <div key={day} className="p-2 text-center text-xs font-medium text-gray-500 bg-gray-50 rounded-md">
-              {day}
-            </div>
-          ))}
-          
-          {/* Calendar days */}
-          {calendarDays.map((calendarDay, index) => (
-            <div
-              key={index}
-              className={`min-h-[100px] p-1 border border-gray-200 rounded-md ${
-                !calendarDay.isCurrentMonth 
-                  ? 'bg-gray-50' 
-                  : calendarDay.isToday 
-                  ? 'bg-blue-50 border-blue-300' 
-                  : 'bg-white hover:bg-gray-50'
-              } transition-colors`}
-            >
-              {/* Day number */}
-              <div className={`text-sm font-medium mb-1 ${
-                !calendarDay.isCurrentMonth 
-                  ? 'text-gray-400' 
-                  : calendarDay.isToday 
-                  ? 'text-blue-700' 
-                  : 'text-gray-900'
-              }`}>
-                {calendarDay.day}
+        <div className="calendar-grid-container max-h-[800px] overflow-y-auto">
+          {/* Day headers - repeat for each month section */}
+          {monthHeaders.map((header, headerIndex) => (
+            <div key={headerIndex} className="mb-6">
+              <div className="sticky top-0 bg-white z-10 py-2 mb-2">
+                <h4 className="text-lg font-semibold text-gray-800 border-b border-gray-200 pb-2">
+                  {header.month}
+                </h4>
+                <div className="grid grid-cols-7 gap-1 mt-2">
+                  {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
+                    <div key={day} className="p-2 text-center text-xs font-medium text-gray-500 bg-gray-50 rounded-md">
+                      {day}
+                    </div>
+                  ))}
+                </div>
               </div>
               
-              {/* Tasks */}
-              <div className="space-y-1">
-                {calendarDay.tasks.slice(0, 3).map((task) => (
-                  <button
-                    key={task.id}
-                    onClick={() => onTaskClick(task)}
-                    className={`w-full text-left p-1 rounded text-xs font-medium transition-all hover:shadow-sm ${
-                      task.status === 'done' 
-                        ? 'bg-green-100 text-green-800 hover:bg-green-200' 
-                        : 'bg-white text-gray-700 hover:bg-gray-100 shadow-sm border border-gray-200'
-                    }`}
+              <div className="grid grid-cols-7 gap-1">
+                {/* Calendar days for this month */}
+                {calendarDays.slice(header.index, headerIndex < monthHeaders.length - 1 ? monthHeaders[headerIndex + 1].index : calendarDays.length).map((calendarDay, index) => (
+                  <div
+                    key={header.index + index}
+                    className={`min-h-[100px] p-1 border border-gray-200 rounded-md ${
+                      !calendarDay.isCurrentMonth 
+                        ? 'bg-gray-50' 
+                        : calendarDay.isToday 
+                        ? 'bg-blue-50 border-blue-300' 
+                        : 'bg-white hover:bg-gray-50'
+                    } transition-colors`}
                   >
-                    <div className="flex items-center gap-1">
-                      <div className={`w-2 h-2 rounded-full flex-shrink-0 ${getPriorityColor(task.priority)}`} />
-                      <span className="truncate flex-1">{task.title}</span>
-                      {getStatusIcon(task.status)}
+                    {/* Day number */}
+                    <div className={`text-sm font-medium mb-1 ${
+                      !calendarDay.isCurrentMonth 
+                        ? 'text-gray-300' 
+                        : calendarDay.isToday 
+                        ? 'text-blue-700 font-bold' 
+                        : 'text-gray-900'
+                    }`}>
+                      {calendarDay.day}
                     </div>
-                  </button>
-                ))}
-                
-                {/* Show more indicator */}
-                {calendarDay.tasks.length > 3 && (
-                  <div className="text-xs text-gray-500 px-1">
-                    +{calendarDay.tasks.length - 3} more
+                    
+                    {/* Tasks */}
+                    <div className="space-y-1">
+                      {calendarDay.tasks.slice(0, 3).map((task) => (
+                        <button
+                          key={task.id}
+                          onClick={() => onTaskClick(task)}
+                          className={`w-full text-left p-1 rounded text-xs font-medium transition-all hover:shadow-sm ${
+                            task.status === 'done' 
+                              ? 'bg-green-100 text-green-800 hover:bg-green-200' 
+                              : 'bg-white text-gray-700 hover:bg-gray-100 shadow-sm border border-gray-200'
+                          }`}
+                        >
+                          <div className="flex items-center gap-1">
+                            <div className={`w-2 h-2 rounded-full flex-shrink-0 ${getPriorityColor(task.priority)}`} />
+                            <span className="truncate flex-1">{task.title}</span>
+                            {getStatusIcon(task.status)}
+                          </div>
+                        </button>
+                      ))}
+                      
+                      {/* Show more indicator */}
+                      {calendarDay.tasks.length > 3 && (
+                        <div className="text-xs text-gray-500 px-1">
+                          +{calendarDay.tasks.length - 3} more
+                        </div>
+                      )}
+                    </div>
                   </div>
-                )}
+                ))}
               </div>
             </div>
           ))}

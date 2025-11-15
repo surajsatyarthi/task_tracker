@@ -13,7 +13,7 @@ This is a **task management application** built around the **Eisenhower Matrix**
   - `not_urgent_important`: Schedule (Green)
   - `not_urgent_not_important`: Eliminate (Blue)
 - **Drag & Drop**: Tasks can be moved between quadrants using `@hello-pangea/dnd`
-- **Multi-project support**: Tasks belong to projects (Personal, BMN, CSuite)
+- **Multi-project support**: Tasks belong to projects (Personal, CSuite, Health, Journaling, LinkedIn)
 - **CSV Import**: Designed to import task data from CSV files
 - **Supabase Integration**: Backend database using `@supabase/supabase-js`
 
@@ -43,7 +43,7 @@ npm run lint
 ## Database Schema
 
 The application expects these main entities:
-- **Projects**: Multi-tenant organization (Personal, BMN, CSuite)
+- **Projects**: Multi-tenant organization (Personal, CSuite, Health, Journaling, LinkedIn)
 - **Tasks**: Core task entities with Eisenhower classification
 - **Task Progress**: Daily tracking data (for CSV-like progress monitoring)
 - **CSV Import Logs**: Track bulk imports

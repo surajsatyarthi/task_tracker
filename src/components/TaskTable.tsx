@@ -1,20 +1,13 @@
 'use client';
 
 import React from 'react';
-import { Task, statusConfig, sortTasks, isTaskOverdue, formatDateForDisplay, getDaysUntilDue } from '@/types/task';
+import { Task, statusConfig, priorityConfig, sortTasks, isTaskOverdue, formatDateForDisplay, getDaysUntilDue } from '@/types/task';
 import { CalendarIcon, LinkIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline';
 
 interface TaskTableProps {
   tasks: Task[];
   onTaskClick: (task: Task) => void;
 }
-
-const priorityConfig = {
-  urgent_important: { label: 'Do First', color: 'bg-red-100 text-red-800', icon: '🚨' },
-  urgent_not_important: { label: 'Delegate', color: 'bg-orange-100 text-orange-800', icon: '⏰' },
-  not_urgent_important: { label: 'Schedule', color: 'bg-green-100 text-green-800', icon: '📅' },
-  not_urgent_not_important: { label: 'Eliminate', color: 'bg-blue-100 text-blue-800', icon: '🗑️' },
-};
 
 const TaskTable: React.FC<TaskTableProps> = ({ tasks, onTaskClick }) => {
   const sortedTasks = sortTasks(tasks);
