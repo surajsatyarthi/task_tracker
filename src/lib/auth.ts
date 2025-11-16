@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabase } from '@/lib/supabaseClient';
+import type { User } from '@supabase/supabase-js';
 
-export async function getAuthenticatedUser(request: NextRequest) {
+export async function getAuthenticatedUser(request: NextRequest): Promise<User | null> {
   try {
     // Get the session token from the Authorization header
     const authHeader = request.headers.get('Authorization');
@@ -19,14 +20,14 @@ export async function getAuthenticatedUser(request: NextRequest) {
       return null;
     }
 
-    return data.user;
+    return data.user as User;
   } catch (error) {
     console.error('Auth verification error:', error);
     return null;
   }
 }
 
-export function requireAuth(handler: (request: NextRequest, user: any) => Promise<NextResponse>) {
+export function requireAuth(handler: (request: NextRequest, user: User) => Promise<NextResponse>) {
   return async (request: NextRequest) => {
     const user = await getAuthenticatedUser(request);
     

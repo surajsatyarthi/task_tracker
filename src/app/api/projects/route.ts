@@ -36,7 +36,7 @@ export const GET = requireAuth(async (request: NextRequest, user) => {
   }
 });
 
-export async function POST(request: NextRequest) {
+export const POST = requireAuth(async (request: NextRequest, user) => {
   try {
     const body = await request.json()
     const { name, slug, color = '#6366f1', description = '' } = body
@@ -61,4 +61,4 @@ export async function POST(request: NextRequest) {
     console.error('Unexpected error:', error)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
   }
-}
+})

@@ -98,6 +98,50 @@ export default function TaskTracker() {
       });
       
       setTasks(transformedTasks);
+
+      if ((transformedTasks || []).length === 0) {
+        const token = await supabase.auth.getSession();
+        const importResponse = await fetch('/api/import/csv', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${token.data.session?.access_token}`,
+          },
+        });
+        if (importResponse.ok) {
+          const refresh = await fetch(`/api/tasks?project=${activeProject}`, {
+            headers: {
+              'Authorization': `Bearer ${token.data.session?.access_token}`,
+            },
+          });
+          if (refresh.ok) {
+            const fresh = await refresh.json();
+            const refreshed = (fresh.tasks || []).map((task: unknown) => {
+              const t = task as Record<string, unknown>;
+              return {
+                id: t.id as string,
+                project_id: t.project_id as string,
+                title: t.title as string,
+                description: t.description as string | undefined,
+                status: t.status as TaskStatus,
+                priority: t.priority as TaskPriority,
+                is_urgent: t.is_urgent as boolean,
+                is_important: t.is_important as boolean,
+                owner: t.owner as string | undefined,
+                department: t.department as string | undefined,
+                due_date: t.due_date as string | undefined,
+                completed_date: t.completed_date as string | undefined,
+                remarks: t.remarks as string | undefined,
+                links: (t.links as string[] | undefined) || [],
+                tags: (t.tags as string[] | undefined) || [],
+                original_csv_row: t.original_csv_row as number | undefined,
+                created_at: t.created_at as string,
+                updated_at: t.updated_at as string,
+              };
+            });
+            setTasks(refreshed);
+          }
+        }
+      }
     } catch (error) {
       console.error('Error fetching tasks:', error);
       setError('Failed to load tasks');
@@ -452,12 +496,14 @@ export default function TaskTracker() {
                 tasks={filteredTasks}
                 onTaskClick={setSelectedTask}
                 onTaskMove={handlePriorityChange}
+                highlight={searchQuery}
               />
             )}
             {viewMode === 'table' && (
               <TaskTable
                 tasks={filteredTasks}
                 onTaskClick={setSelectedTask}
+                highlight={searchQuery}
 
               />
             )}
@@ -465,6 +511,7 @@ export default function TaskTracker() {
               <CalendarView
                 tasks={filteredTasks}
                 onTaskClick={setSelectedTask}
+                highlight={searchQuery}
               />
             )}
           </>

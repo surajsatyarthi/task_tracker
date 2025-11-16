@@ -25,42 +25,31 @@ const LinkPreview: React.FC<LinkPreviewProps> = ({ url, className = '' }) => {
   const domain = url ? new URL(url).hostname : '';
 
   useEffect(() => {
-    if (showPreview && !metadata && !loading) {
-      fetchLinkMetadata();
-    }
-  }, [showPreview]);
-
-  const fetchLinkMetadata = async () => {
-    setLoading(true);
-    setError(null);
-    
-    try {
-      // Try to fetch metadata from a simple proxy service
-      // Note: In production, you'd want to use a proper API or server-side solution
-      const response = await fetch(`/api/link-preview?url=${encodeURIComponent(url)}`);
-      
-      if (response.ok) {
-        const data = await response.json();
-        setMetadata(data);
-      } else {
-        // Fallback: extract basic info from URL
-        setMetadata({
-          domain: domain,
-          title: url.split('/').pop() || url,
-        });
+    const run = async () => {
+      if (!showPreview) return;
+      if (metadata || loading) return;
+      setLoading(true);
+      setError(null);
+      try {
+        const response = await fetch(`/api/link-preview?url=${encodeURIComponent(url)}`);
+        if (response.ok) {
+          const data = await response.json();
+          setMetadata(data);
+        } else {
+          setMetadata({ domain, title: url.split('/').pop() || url });
+        }
+      } catch (err) {
+        console.error('Failed to fetch link metadata:', err);
+        setError('Failed to load preview');
+        setMetadata({ domain, title: url.split('/').pop() || url });
+      } finally {
+        setLoading(false);
       }
-    } catch (err) {
-      console.error('Failed to fetch link metadata:', err);
-      setError('Failed to load preview');
-      // Fallback metadata
-      setMetadata({
-        domain: domain,
-        title: url.split('/').pop() || url,
-      });
-    } finally {
-      setLoading(false);
-    }
-  };
+    };
+    run();
+  }, [showPreview, url, domain, metadata, loading]);
+
+  const fetchLinkMetadata = async () => {};
 
   const getDisplayUrl = () => {
     try {

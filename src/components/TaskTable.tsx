@@ -3,14 +3,34 @@
 import React from 'react';
 import { Task, statusConfig, priorityConfig, sortTasks, isTaskOverdue, formatDateForDisplay, getDaysUntilDue } from '@/types/task';
 import { CalendarIcon, LinkIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline';
+import LinkPreview from './LinkPreview';
 
 interface TaskTableProps {
   tasks: Task[];
   onTaskClick: (task: Task) => void;
+  highlight?: string;
 }
 
-const TaskTable: React.FC<TaskTableProps> = ({ tasks, onTaskClick }) => {
+const TaskTable: React.FC<TaskTableProps> = ({ tasks, onTaskClick, highlight }) => {
   const sortedTasks = sortTasks(tasks);
+  const escapeRegExp = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const renderWithHighlight = (text: string) => {
+    const q = (highlight || '').trim();
+    if (!q) return text;
+    const re = new RegExp(`(${escapeRegExp(q)})`, 'ig');
+    const parts = text.split(re);
+    return (
+      <>
+        {parts.map((part, i) => (
+          re.test(part) ? (
+            <mark key={i} className="bg-yellow-200">{part}</mark>
+          ) : (
+            <span key={i}>{part}</span>
+          )
+        ))}
+      </>
+    );
+  };
   if (tasks.length === 0) {
     return (
       <div className="bg-white rounded-lg shadow-sm border border-gray-200">
@@ -71,16 +91,23 @@ const TaskTable: React.FC<TaskTableProps> = ({ tasks, onTaskClick }) => {
                           {isOverdue && (
                             <ExclamationTriangleIcon className="w-4 h-4 text-red-500 animate-pulse flex-shrink-0" />
                           )}
-                          <span>{task.title}</span>
+                          <span>{renderWithHighlight(task.title)}</span>
                         </div>
                         {task.description && (
                           <div className="text-sm text-gray-500 line-clamp-1 mt-1">
-                            {task.description}
+                            {renderWithHighlight(task.description)}
                           </div>
                         )}
                         {task.remarks && (
                           <div className="text-xs text-gray-400 line-clamp-1 mt-1">
-                            {task.remarks}
+                            {renderWithHighlight(task.remarks)}
+                          </div>
+                        )}
+                        {task.links && task.links.length > 0 && (
+                          <div className="mt-2 flex flex-wrap gap-2">
+                            {task.links.slice(0, 2).map((link) => (
+                              <LinkPreview key={link} url={link} />
+                            ))}
                           </div>
                         )}
                       </div>

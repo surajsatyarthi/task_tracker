@@ -8,6 +8,7 @@ import { CheckCircleIcon, ExclamationCircleIcon } from '@heroicons/react/24/soli
 interface CalendarViewProps {
   tasks: Task[];
   onTaskClick: (task: Task) => void;
+  highlight?: string;
 }
 
 interface CalendarDay {
@@ -18,7 +19,26 @@ interface CalendarDay {
   tasks: Task[];
 }
 
-const CalendarView: React.FC<CalendarViewProps> = ({ tasks, onTaskClick }) => {
+const CalendarView: React.FC<CalendarViewProps> = ({ tasks, onTaskClick, highlight }) => {
+  const escapeRegExp = (s: string) => s.replace(/[.*+?^${}()|[\\]\\]/g, '\\$&');
+  const renderWithHighlight = (text?: string) => {
+    if (!text) return null;
+    const q = (highlight || '').trim();
+    if (!q) return text;
+    const re = new RegExp(`(${escapeRegExp(q)})`, 'ig');
+    const parts = text.split(re);
+    return (
+      <>
+        {parts.map((part, i) => (
+          re.test(part) ? (
+            <mark key={i} className="bg-yellow-200">{part}</mark>
+          ) : (
+            <span key={i}>{part}</span>
+          )
+        ))}
+      </>
+    );
+  };
   // Fixed date range: November 16, 2025 to November 16, 2026 (1 full year)
   const START_DATE = new Date('2025-11-16');
   const END_DATE = new Date('2026-11-16');
@@ -182,7 +202,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({ tasks, onTaskClick }) => {
                         >
                           <div className="flex items-center gap-1">
                             <div className={`w-2 h-2 rounded-full flex-shrink-0 ${getPriorityColor(task.priority)}`} />
-                            <span className="truncate flex-1">{task.title}</span>
+                            <span className="truncate flex-1">{renderWithHighlight(task.title)}</span>
                             {getStatusIcon(task.status)}
                           </div>
                         </button>
@@ -234,13 +254,13 @@ const CalendarView: React.FC<CalendarViewProps> = ({ tasks, onTaskClick }) => {
                           ? 'text-green-800 line-through' 
                           : 'text-gray-900'
                       }`}>
-                        {task.title}
+                        {renderWithHighlight(task.title)}
                       </h4>
                       {getStatusIcon(task.status)}
                     </div>
                     {task.description && (
                       <p className="text-xs text-gray-600 mt-1 truncate">
-                        {task.description}
+                        {renderWithHighlight(task.description)}
                       </p>
                     )}
                   </div>

@@ -8,11 +8,31 @@ interface TaskCardProps {
   task: Task;
   isDragging?: boolean;
   onClick?: () => void;
+  highlight?: string;
 }
 
-const TaskCard: React.FC<TaskCardProps> = ({ task, isDragging = false, onClick }) => {
+const TaskCard: React.FC<TaskCardProps> = ({ task, isDragging = false, onClick, highlight }) => {
   const statusStyle = statusConfig[task.status];
   const isOverdue = isTaskOverdue(task);
+
+  const escapeRegExp = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const renderWithHighlight = (text: string) => {
+    const q = (highlight || '').trim();
+    if (!q) return text;
+    const re = new RegExp(`(${escapeRegExp(q)})`, 'ig');
+    const parts = text.split(re);
+    return (
+      <>
+        {parts.map((part, i) => (
+          re.test(part) ? (
+            <mark key={i} className="bg-yellow-200">{part}</mark>
+          ) : (
+            <span key={i}>{part}</span>
+          )
+        ))}
+      </>
+    );
+  };
 
   return (
     <div
@@ -35,7 +55,7 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, isDragging = false, onClick }
         <h4 className={`font-semibold leading-tight line-clamp-2 ${
           isOverdue ? 'text-red-800' : 'text-gray-900'
         }`}>
-          {task.title}
+          {renderWithHighlight(task.title)}
         </h4>
         <span className={`
           inline-flex items-center px-2 py-1 rounded-full text-xs font-medium ml-2 flex-shrink-0
@@ -49,14 +69,14 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, isDragging = false, onClick }
       {/* Task Description */}
       {task.description && (
         <p className="text-sm text-gray-600 mb-3 line-clamp-2">
-          {task.description}
+          {renderWithHighlight(task.description)}
         </p>
       )}
 
       {/* Task Remarks */}
       {task.remarks && (
         <p className="text-xs text-gray-500 mb-3 line-clamp-1">
-          {task.remarks}
+          {renderWithHighlight(task.remarks)}
         </p>
       )}
 
