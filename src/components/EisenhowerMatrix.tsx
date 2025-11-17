@@ -12,35 +12,18 @@ interface EisenhowerMatrixProps {
   highlight?: string;
 }
 
-const matrixConfig = {
-  urgent_important: {
-    title: 'Do First',
-    description: 'Urgent & Important',
-    color: 'bg-red-50 border-red-200',
-    headerColor: 'bg-red-500 text-white',
-    ...priorityConfig.urgent_important,
-  },
-  urgent_not_important: {
-    title: 'Delegate',
-    description: 'Urgent & Not Important', 
-    color: 'bg-orange-50 border-orange-200',
-    headerColor: 'bg-orange-500 text-white',
-    ...priorityConfig.urgent_not_important,
-  },
-  not_urgent_important: {
-    title: 'Schedule',
-    description: 'Not Urgent & Important',
-    color: 'bg-green-50 border-green-200',
-    headerColor: 'bg-green-500 text-white',
-    ...priorityConfig.not_urgent_important,
-  },
-  not_urgent_not_important: {
-    title: 'Eliminate',
-    description: 'Not Urgent & Not Important',
-    color: 'bg-blue-50 border-blue-200',
-    headerColor: 'bg-blue-500 text-white',
-    ...priorityConfig.not_urgent_not_important,
-  },
+const headerColors: Record<TaskPriority, string> = {
+  urgent_important: 'bg-red-500 text-white',
+  urgent_not_important: 'bg-orange-500 text-white',
+  not_urgent_important: 'bg-green-500 text-white',
+  not_urgent_not_important: 'bg-blue-500 text-white',
+};
+
+const headerText: Record<TaskPriority, { title: string; description: string }> = {
+  urgent_important: { title: 'Do First', description: 'Urgent & Important' },
+  urgent_not_important: { title: 'Delegate', description: 'Urgent & Not Important' },
+  not_urgent_important: { title: 'Schedule', description: 'Not Urgent & Important' },
+  not_urgent_not_important: { title: 'Eliminate', description: 'Not Urgent & Not Important' },
 };
 
 const EisenhowerMatrix: React.FC<EisenhowerMatrixProps> = ({
@@ -82,12 +65,12 @@ const EisenhowerMatrix: React.FC<EisenhowerMatrixProps> = ({
                   `}
                 >
                   {/* Quadrant Header */}
-                  <div className={`${config.headerColor} p-3 sm:p-4 rounded-t-lg`}>
+                  <div className={`${headerColors[priority]} p-3 sm:p-4 rounded-t-lg`}>
                     <div className="flex items-center gap-2 sm:gap-3">
                       <span className="text-xl sm:text-2xl">{config.icon}</span>
                       <div className="flex-1 min-w-0">
-                        <h3 className="font-bold text-base sm:text-lg truncate">{config.title}</h3>
-                        <p className="text-xs sm:text-sm opacity-90 truncate">{config.description}</p>
+                        <h3 className="font-bold text-base sm:text-lg truncate">{headerText[priority].title}</h3>
+                        <p className="text-xs sm:text-sm opacity-90 truncate">{headerText[priority].description}</p>
                       </div>
                     </div>
                     <div className="mt-2">

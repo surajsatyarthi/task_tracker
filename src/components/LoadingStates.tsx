@@ -52,7 +52,7 @@ export const LoadingCard: React.FC<LoadingCardProps> = ({ count = 3 }) => {
 };
 
 interface LoadingSkeletonProps {
-  type?: 'table' | 'matrix' | 'list';
+  type?: 'table' | 'matrix' | 'list' | 'calendar';
   count?: number;
 }
 
@@ -96,6 +96,23 @@ export const LoadingSkeleton: React.FC<LoadingSkeletonProps> = ({ type = 'list',
                   <div className="h-2 bg-gray-200 rounded w-3/4"></div>
                 </div>
               ))}
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  if (type === 'calendar') {
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-7 gap-4">
+        {Array.from({ length: 7 }).map((_, i) => (
+          <div key={i} className="bg-white rounded-lg shadow-sm border p-4 animate-pulse">
+            <div className="h-4 bg-gray-200 rounded w-1/3 mb-3"></div>
+            <div className="space-y-2">
+              <div className="h-3 bg-gray-200 rounded w-full"></div>
+              <div className="h-3 bg-gray-200 rounded w-3/4"></div>
+              <div className="h-3 bg-gray-200 rounded w-1/2"></div>
             </div>
           </div>
         ))}

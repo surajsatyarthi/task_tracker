@@ -255,7 +255,7 @@ export default function TaskTracker() {
       task.owner?.toLowerCase().includes(query) ||
       task.department?.toLowerCase().includes(query) ||
       task.remarks?.toLowerCase().includes(query) ||
-      task.tags.some(tag => tag.toLowerCase().includes(query))
+      (task.tags || []).some(tag => tag.toLowerCase().includes(query))
     );
   });
 
