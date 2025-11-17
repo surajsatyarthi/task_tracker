@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { requireAuth } from '@/lib/auth'
-import { supabase } from '@/lib/supabaseClient'
+import { supabase, supabaseAdmin } from '@/lib/supabaseClient'
 import fs from 'fs'
 import path from 'path'
 import Papa from 'papaparse'
@@ -55,11 +55,32 @@ export const POST = requireAuth(async (request: NextRequest, user) => {
     const personalId = await ensureProject('personal', 'Personal', '#6366f1')
     const csuiteId = await ensureProject('csuite', 'CSuite', '#dc2626')
 
+    // Ensure storage bucket and attempt to download cloud CSVs
+    try {
+      await supabaseAdmin.storage.createBucket('seeds', { public: true })
+    } catch {}
+    const storage = supabaseAdmin.storage.from('seeds')
+
+    async function readCsvFromStorageOrLocal(key: string, localPath: string): Promise<string | null> {
+      const dl = await storage.download(key)
+      if (dl.data) {
+        const ab = await dl.data.arrayBuffer()
+        return Buffer.from(ab).toString('utf-8')
+      }
+      if (fs.existsSync(localPath)) {
+        const content = fs.readFileSync(localPath, 'utf-8')
+        // Try to upload for future cloud use
+        const _up = await storage.upload(key, new Blob([content], { type: 'text/csv' }), { upsert: true })
+        return content
+      }
+      return null
+    }
+
     const inserts: Array<Record<string, unknown>> = []
 
-    if (fs.existsSync(pCsvPath)) {
-      const content = fs.readFileSync(pCsvPath, 'utf-8')
-      const parsed = Papa.parse<string[]>(content, { skipEmptyLines: true })
+    const personalCsv = await readCsvFromStorageOrLocal('personal.csv', pCsvPath)
+    if (personalCsv) {
+      const parsed = Papa.parse<string[]>(personalCsv, { skipEmptyLines: true })
       for (const row of parsed.data) {
         const cells = Array.isArray(row) ? row : []
         if (cells.length === 0) continue
@@ -67,8 +88,8 @@ export const POST = requireAuth(async (request: NextRequest, user) => {
         if (!primary) continue
         const links = cells.filter(c => typeof c === 'string' && isUrl(c))
         const priority = 'not_urgent_important'
-        const is_urgent = priority === 'urgent_important' || priority === 'urgent_not_important'
-        const is_important = priority === 'urgent_important' || priority === 'not_urgent_important'
+        const is_urgent = false
+        const is_important = true
         inserts.push({
           project_id: personalId,
           title: primary,
@@ -86,9 +107,9 @@ export const POST = requireAuth(async (request: NextRequest, user) => {
       }
     }
 
-    if (fs.existsSync(csaCsvPath)) {
-      const content = fs.readFileSync(csaCsvPath, 'utf-8')
-      const parsed = Papa.parse<string[]>(content, { skipEmptyLines: true })
+    const csuiteCsv = await readCsvFromStorageOrLocal('csuite.csv', csaCsvPath)
+    if (csuiteCsv) {
+      const parsed = Papa.parse<string[]>(csuiteCsv, { skipEmptyLines: true })
       for (const row of parsed.data) {
         const cells = Array.isArray(row) ? row : []
         if (cells.length === 0) continue
