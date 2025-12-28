@@ -20,6 +20,7 @@ export default function TaskTracker() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
   const [activeProject, setActiveProject] = useState<string>('personal');
+  const [categoryFilter, setCategoryFilter] = useState<'personal' | 'csuite'>('personal');
   const [viewMode, setViewMode] = useState<'matrix' | 'table' | 'calendar'>('matrix');
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [showTaskModal, setShowTaskModal] = useState(false);
@@ -311,13 +312,11 @@ export default function TaskTracker() {
 
   const currentProject = projects.find(p => p.slug === activeProject);
   
-  // Filter tasks by project and search query
+  // Filter tasks by category (personal/csuite) and search query
   const filteredTasks = tasks.filter(task => {
-    const matchesProject = task.project_id === currentProject?.id;
-    if (!matchesProject) return false;
-    
+    const matchesCategory = task.project_id === categoryFilter;
+    if (!matchesCategory) return false;
     if (!searchQuery.trim()) return true;
-    
     const query = searchQuery.toLowerCase();
     return (
       task.title.toLowerCase().includes(query) ||
@@ -456,37 +455,56 @@ export default function TaskTracker() {
         </div>
       </div>
 
-      {/* Project Tabs */}
+      {/* Category Filter and Project Tabs */}
       <div className="bg-white border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex space-x-8 overflow-x-auto">
-            {projects.map((project) => {
-              const taskCount = getTaskCountForProject(project.id);
-              return (
-                <button
-                  key={project.id}
-                  onClick={() => setActiveProject(project.slug)}
-                  className={`py-4 px-1 border-b-2 font-medium text-sm whitespace-nowrap flex items-center gap-2 ${
-                    activeProject === project.slug
-                      ? 'border-indigo-500 text-indigo-600'
-                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                  }`}
-                  style={{
-                    color: activeProject === project.slug ? project.color : undefined,
-                    borderColor: activeProject === project.slug ? project.color : undefined
-                  }}
-                >
-                  <span>{project.name}</span>
-                  <span className={`px-2 py-1 text-xs rounded-full ${
-                    activeProject === project.slug 
-                      ? 'bg-white bg-opacity-20' 
-                      : 'bg-gray-100 text-gray-600'
-                  }`}>
-                    {taskCount}
-                  </span>
-                </button>
-              );
-            })}
+          <div className="flex flex-col md:flex-row md:items-center md:space-x-8">
+            {/* Category Filter */}
+            <div className="flex items-center space-x-2 py-2">
+              <span className="text-sm font-medium text-gray-700">Show:</span>
+              <button
+                className={`px-3 py-1 rounded-md text-sm font-semibold border ${categoryFilter === 'personal' ? 'bg-indigo-100 text-indigo-700 border-indigo-400' : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-50'}`}
+                onClick={() => setCategoryFilter('personal')}
+              >
+                Personal
+              </button>
+              <button
+                className={`px-3 py-1 rounded-md text-sm font-semibold border ${categoryFilter === 'csuite' ? 'bg-red-100 text-red-700 border-red-400' : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-50'}`}
+                onClick={() => setCategoryFilter('csuite')}
+              >
+                CSuite
+              </button>
+            </div>
+            {/* Project Tabs (optional, can be hidden if not needed) */}
+            <div className="flex space-x-8 overflow-x-auto mt-2 md:mt-0">
+              {projects.map((project) => {
+                const taskCount = getTaskCountForProject(project.id);
+                return (
+                  <button
+                    key={project.id}
+                    onClick={() => setActiveProject(project.slug)}
+                    className={`py-4 px-1 border-b-2 font-medium text-sm whitespace-nowrap flex items-center gap-2 ${
+                      activeProject === project.slug
+                        ? 'border-indigo-500 text-indigo-600'
+                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                    }`}
+                    style={{
+                      color: activeProject === project.slug ? project.color : undefined,
+                      borderColor: activeProject === project.slug ? project.color : undefined
+                    }}
+                  >
+                    <span>{project.name}</span>
+                    <span className={`px-2 py-1 text-xs rounded-full ${
+                      activeProject === project.slug 
+                        ? 'bg-white bg-opacity-20' 
+                        : 'bg-gray-100 text-gray-600'
+                    }`}>
+                      {taskCount}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
         </div>
       </div>
