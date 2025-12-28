@@ -8,7 +8,6 @@ import TaskDetailModal from '@/components/TaskDetailModal';
 import AddTaskModal from '@/components/AddTaskModal';
 import HealthDashboard from '@/components/HealthDashboard';
 import JournalDashboard from '@/components/JournalDashboard';
-import LinkedInTracker from '@/components/LinkedInTracker';
 import { Task, TaskStatus, TaskPriority, Project, getFlagsFromPriority } from '@/types/task';
 import { Squares2X2Icon, TableCellsIcon, CalendarIcon, ArchiveBoxIcon } from '@heroicons/react/24/outline';
 
@@ -18,7 +17,6 @@ const projects: Project[] = [
   { id: 'csuite', name: 'CSuite', slug: 'csuite', color: '#dc2626', is_active: true, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
   { id: 'health', name: 'Health', slug: 'health', color: '#f59e0b', is_active: true, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
   { id: 'journaling', name: 'Journaling', slug: 'journaling', color: '#8b5cf6', is_active: true, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
-  { id: 'linkedin', name: 'LinkedIn', slug: 'linkedin', color: '#0077b5', is_active: true, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
 ];
 
 // Personal tasks from CSV - ALL set to 'todo' status as requested (no due dates)
@@ -62,10 +60,6 @@ const sampleTasks: Task[] = [
   // Journaling Tasks
   { id: 'j1', project_id: 'journaling', title: 'Daily Reflection', status: 'done', priority: 'not_urgent_important', is_urgent: false, is_important: true, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
   { id: 'j2', project_id: 'journaling', title: 'Weekly Review', status: 'todo', priority: 'not_urgent_important', is_urgent: false, is_important: true, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
-  
-  // LinkedIn Tasks
-  { id: 'l1', project_id: 'linkedin', title: 'LinkedIn Profile Update', status: 'doing', priority: 'urgent_not_important', is_urgent: true, is_important: false, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
-  { id: 'l2', project_id: 'linkedin', title: 'LinkedIn Content Creation', status: 'todo', priority: 'not_urgent_important', is_urgent: false, is_important: true, created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
 ];
 
 // Combine all tasks
@@ -132,14 +126,12 @@ export default function TaskTracker() {
         return <HealthDashboard />;
       case 'journaling':
         return <JournalDashboard />;
-      case 'linkedin':
-        return <LinkedInTracker />;
       default:
         return null;
     }
   };
 
-  const showSpecialDashboard = ['health', 'journaling', 'linkedin'].includes(activeProject);
+  const showSpecialDashboard = ['health', 'journaling'].includes(activeProject);
 
   return (
     <div className="min-h-screen bg-gray-50">

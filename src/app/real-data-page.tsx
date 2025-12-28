@@ -8,7 +8,6 @@ import TaskDetailModal from '@/components/TaskDetailModal';
 import AddTaskModal from '@/components/AddTaskModal';
 import HealthDashboard from '@/components/HealthDashboard';
 import JournalDashboard from '@/components/JournalDashboard';
-import LinkedInTracker from '@/components/LinkedInTracker';
 import { useAuth, supabase } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import { Task, TaskStatus, TaskPriority, Project } from '@/types/task';
@@ -313,14 +312,12 @@ export default function TaskTracker() {
         return <HealthDashboard />;
       case 'journaling':
         return <JournalDashboard />;
-      case 'linkedin':
-        return <LinkedInTracker />;
       default:
         return null;
     }
   };
 
-  const showSpecialDashboard = ['health', 'journaling', 'linkedin'].includes(activeProject);
+  const showSpecialDashboard = ['health', 'journaling'].includes(activeProject);
 
   return (
     <div className="min-h-screen bg-gray-50">

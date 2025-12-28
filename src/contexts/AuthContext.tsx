@@ -83,6 +83,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       
       if (error) throw error;
       
+      // Check if email is verified
+      if (data.user && !data.user.email_confirmed_at) {
+        throw new Error('Please verify your email before signing in. Check your inbox for the verification link.');
+      }
+      
       setUser(data.user ? {
         id: data.user.id,
         email: data.user.email!,
@@ -99,18 +104,28 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const signUp = async (email: string, password: string) => {
     setLoading(true);
     try {
+      // Use the deployed Vercel URL for email verification
+      const vercelUrl = process.env.NEXT_PUBLIC_VERCEL_URL;
+      const baseUrl = vercelUrl ? `https://${vercelUrl}` : (process.env.NEXT_PUBLIC_APP_URL || (typeof window !== 'undefined' ? window.location.origin : 'http://localhost:3000'));
+      
+      const redirectTo = `${baseUrl}/auth/callback`;
+      
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
+        options: { 
+          emailRedirectTo: redirectTo,
+          data: {
+            email_verified: false
+          }
+        },
       });
       
       if (error) throw error;
       
-      setUser(data.user ? {
-        id: data.user.id,
-        email: data.user.email!,
-        created_at: data.user.created_at,
-      } : null);
+      // Don't auto-sign in the user after signup - they need to verify email first
+      setUser(null);
+      
     } catch (error) {
       console.error('Error signing up:', error);
       throw error;

@@ -79,13 +79,12 @@ CREATE TRIGGER update_projects_updated_at BEFORE UPDATE ON projects
 CREATE TRIGGER update_tasks_updated_at BEFORE UPDATE ON tasks
   FOR EACH ROW EXECUTE FUNCTION update_updated_at_column();
 
--- Insert default projects (matching your current setup)
+-- Insert default projects (4 projects for personal use)
 INSERT INTO projects (name, slug, color, description) VALUES
   ('Personal', 'personal', '#6366f1', 'Personal tasks and goals'),
   ('CSuite', 'csuite', '#dc2626', 'CSuite project tasks'),
-  ('Health', 'health', '#f59e0b', 'Health and wellness tasks'),
-  ('Journaling', 'journaling', '#8b5cf6', 'Journaling and reflection tasks'),
-  ('LinkedIn', 'linkedin', '#0077b5', 'LinkedIn and professional networking')
+  ('Health', 'health', '#f59e0b', 'Health and wellness tracking'),
+  ('Journaling', 'journaling', '#8b5cf6', 'Daily journaling and reflection')
 ON CONFLICT (slug) DO NOTHING;
 
 -- Enable Row Level Security (RLS)

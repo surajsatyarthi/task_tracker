@@ -1,7 +1,8 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
+import { supabase } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 
 export default function LoginPage() {
@@ -13,6 +14,18 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');
 
+  useEffect(() => {
+    const hash = typeof window !== 'undefined' ? window.location.hash : '';
+    if (!hash) return;
+    const params = new URLSearchParams(hash.startsWith('#') ? hash.slice(1) : hash);
+    const err = params.get('error');
+    const desc = params.get('error_description');
+    if (err) {
+      setError(decodeURIComponent(desc || 'Authentication error'));
+      setIsSignUp(false);
+    }
+  }, []);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
@@ -21,8 +34,10 @@ export default function LoginPage() {
     try {
       if (isSignUp) {
         await signUp(email, password);
-        setMessage('Account created successfully! Please sign in.');
+        setMessage('Account created! Please check your email for verification link.');
         setIsSignUp(false);
+        setEmail('');
+        setPassword('');
       } else {
         await signIn(email, password);
         router.push('/');
@@ -60,6 +75,31 @@ export default function LoginPage() {
                 </div>
                 <div className="ml-3">
                   <p className="text-sm text-red-700">{error}</p>
+                  <div className="mt-2 flex items-center gap-2">
+                    <input
+                      type="email"
+                      placeholder="Enter your email to resend"
+                      className="border rounded px-2 py-1 text-sm"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                    />
+                    <button
+                      type="button"
+                      className="text-sm text-indigo-600 hover:text-indigo-700"
+                      onClick={async () => {
+                        setMessage('');
+                        try {
+                          await supabase.auth.resend({ type: 'signup', email });
+                          setMessage('Verification email resent. Please check your inbox.');
+                          setError('');
+                        } catch (e) {
+                          setError('Could not resend verification email');
+                        }
+                      }}
+                    >
+                      Resend verification email
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>

@@ -99,6 +99,11 @@ csv_imports {
 [
   { "id": "p1", "name": "Personal", "slug": "personal", "color": "#6366f1" },
   { "id": "p2", "name": "CSuite", "slug": "csuite", "color": "#dc2626" },
+  { "id": "p3", "name": "Health", "slug": "health", "color": "#f59e0b" },
+  { "id": "p4", "name": "Journaling", "slug": "journaling", "color": "#8b5cf6" }
+]
+```
+  { "id": "p2", "name": "CSuite", "slug": "csuite", "color": "#dc2626" },
   { "id": "p3", "name": "Health", "slug": "health", "color": "#059669" },
   { "id": "p4", "name": "Journaling", "slug": "journaling", "color": "#7c3aed" },
   { "id": "p5", "name": "LinkedIn", "slug": "linkedin", "color": "#0a66c2" }
