@@ -98,6 +98,8 @@ export default function TaskTracker() {
       
       setTasks(transformedTasks);
 
+      // Removed auto-import - slows down app
+      /*
       if ((transformedTasks || []).length === 0) {
         const token = await supabase.auth.getSession();
         const importResponse = await fetch('/api/import/csv', {
@@ -141,6 +143,7 @@ export default function TaskTracker() {
           }
         }
       }
+      */
     } catch (error) {
       console.error('Error fetching tasks:', error);
       setError('Failed to load tasks');

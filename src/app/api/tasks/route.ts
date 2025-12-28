@@ -11,7 +11,7 @@ export const GET = requireAuth(async (request: NextRequest, user) => {
       .from('tasks')
       .select(`
         *,
-        projects!inner(*)
+        projects(*)
       `)
       .order('created_at', { ascending: false })
     
