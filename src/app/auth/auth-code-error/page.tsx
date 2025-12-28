@@ -46,7 +46,7 @@ export default function AuthErrorPage() {
           </p>
           <ul className="mt-4 text-sm text-gray-600 text-left space-y-2">
             <li>• Your email verification link has expired</li>
-            <li>• You haven't verified your email address yet</li>
+            <li>• You haven&apos;t verified your email address yet</li>
             <li>• There was an error during the authentication process</li>
           </ul>
         </div>
