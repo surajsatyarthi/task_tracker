@@ -39,9 +39,9 @@ const CalendarView: React.FC<CalendarViewProps> = ({ tasks, onTaskClick, highlig
       </>
     );
   };
-  // Fixed date range: November 16, 2025 to November 16, 2026 (1 full year)
-  const START_DATE = new Date('2025-11-16');
-  const END_DATE = new Date('2026-11-16');
+  // Fixed date range: January 1, 2026 to December 31, 2026 (full year)
+  const START_DATE = new Date('2026-01-01');
+  const END_DATE = new Date('2026-12-31');
 
   const { calendarDays, dateRange, monthHeaders } = useMemo(() => {
     // Generate all days from START_DATE to END_DATE
