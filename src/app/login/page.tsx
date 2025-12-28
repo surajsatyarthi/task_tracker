@@ -2,17 +2,14 @@
 
 import React, { useEffect, useState } from 'react';
 import { useAuth } from '@/contexts/AuthContext';
-import { supabase } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 
 export default function LoginPage() {
-  const { signIn, signUp, loading } = useAuth();
+  const { signIn, loading } = useAuth();
   const router = useRouter();
-  const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const [message, setMessage] = useState('');
 
   useEffect(() => {
     const hash = typeof window !== 'undefined' ? window.location.hash : '';
@@ -22,26 +19,16 @@ export default function LoginPage() {
     const desc = params.get('error_description');
     if (err) {
       setError(decodeURIComponent(desc || 'Authentication error'));
-      setIsSignUp(false);
     }
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    setMessage('');
 
     try {
-      if (isSignUp) {
-        await signUp(email, password);
-        setMessage('Account created! Please check your email for verification link.');
-        setIsSignUp(false);
-        setEmail('');
-        setPassword('');
-      } else {
-        await signIn(email, password);
-        router.push('/');
-      }
+      await signIn(email, password);
+      router.push('/');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
     }
@@ -57,10 +44,10 @@ export default function LoginPage() {
             </svg>
           </div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
-            {isSignUp ? 'Create your account' : 'Sign in to your account'}
+            Sign in to Task Tracker Pro
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600">
-            Task Tracker Pro - Professional task management
+            Personal task management system
           </p>
         </div>
         
@@ -75,46 +62,6 @@ export default function LoginPage() {
                 </div>
                 <div className="ml-3">
                   <p className="text-sm text-red-700">{error}</p>
-                  <div className="mt-2 flex items-center gap-2">
-                    <input
-                      type="email"
-                      placeholder="Enter your email to resend"
-                      className="border rounded px-2 py-1 text-sm"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                    />
-                    <button
-                      type="button"
-                      className="text-sm text-indigo-600 hover:text-indigo-700"
-                      onClick={async () => {
-                        setMessage('');
-                        try {
-                          await supabase.auth.resend({ type: 'signup', email });
-                          setMessage('Verification email resent. Please check your inbox.');
-                          setError('');
-                        } catch (e) {
-                          setError('Could not resend verification email');
-                        }
-                      }}
-                    >
-                      Resend verification email
-                    </button>
-                  </div>
-                </div>
-              </div>
-            </div>
-          )}
-
-          {message && (
-            <div className="bg-green-50 border border-green-200 rounded-md p-4">
-              <div className="flex">
-                <div className="flex-shrink-0">
-                  <svg className="h-5 w-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                  </svg>
-                </div>
-                <div className="ml-3">
-                  <p className="text-sm text-green-700">{message}</p>
                 </div>
               </div>
             </div>
@@ -195,4 +142,8 @@ export default function LoginPage() {
       </div>
     </div>
   );
-}
+}Signing in...
+                </div>
+              ) : (
+                'Sign In'
+              )
