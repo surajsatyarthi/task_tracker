@@ -172,13 +172,17 @@ export default function TaskTracker() {
         body: JSON.stringify(updatedTask),
       });
       
-      if (!response.ok) throw new Error('Failed to update task');
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('Update error:', errorData);
+        throw new Error(errorData.error || 'Failed to update task');
+      }
       
       // Refresh tasks
       await fetchTasks();
     } catch (error) {
       console.error('Error updating task:', error);
-      setError('Failed to update task');
+      setError(error instanceof Error ? error.message : 'Failed to update task');
     }
   };
 
@@ -229,16 +233,64 @@ export default function TaskTracker() {
     const task = tasks.find(t => t.id === taskId);
     if (!task) return;
 
-    const updatedTask = { ...task, priority: newPriority };
-    await handleTaskUpdate(updatedTask);
+    // Only send the changed fields for better performance
+    const updates = { priority: newPriority };
+    
+    try {
+      const token = await supabase.auth.getSession();
+      const response = await fetch(`/api/tasks/${taskId}`, {
+        method: 'PUT',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token.data.session?.access_token}`,
+        },
+        body: JSON.stringify(updates),
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('Update error:', errorData);
+        throw new Error(errorData.error || 'Failed to update task');
+      }
+      
+      // Refresh tasks
+      await fetchTasks();
+    } catch (error) {
+      console.error('Error updating task priority:', error);
+      setError(error instanceof Error ? error.message : 'Failed to update task');
+    }
   };
 
   const handleStatusChange = async (taskId: string, newStatus: string) => {
     const task = tasks.find(t => t.id === taskId);
     if (!task) return;
 
-    const updatedTask = { ...task, status: newStatus as TaskStatus };
-    await handleTaskUpdate(updatedTask);
+    // Only send the changed fields
+    const updates = { status: newStatus as TaskStatus };
+    
+    try {
+      const token = await supabase.auth.getSession();
+      const response = await fetch(`/api/tasks/${taskId}`, {
+        method: 'PUT',
+        headers: { 
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token.data.session?.access_token}`,
+        },
+        body: JSON.stringify(updates),
+      });
+      
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error('Update error:', errorData);
+        throw new Error(errorData.error || 'Failed to update task');
+      }
+      
+      // Refresh tasks
+      await fetchTasks();
+    } catch (error) {
+      console.error('Error updating task status:', error);
+      setError(error instanceof Error ? error.message : 'Failed to update task');
+    }
   };
 
   const currentProject = projects.find(p => p.slug === activeProject);

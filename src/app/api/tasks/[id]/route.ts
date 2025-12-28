@@ -13,28 +13,35 @@ export async function PUT(
   const { id } = await params;
   try {
     const body = await request.json()
-    const { title, project_id, status, priority, description, due_date, links, tags, remarks } = body
     
-    // Parse priority to get flags
-    const is_urgent = priority === 'urgent_important' || priority === 'urgent_not_important'
-    const is_important = priority === 'urgent_important' || priority === 'not_urgent_important'
+    // Build update object with only provided fields
+    const updateData: any = {
+      updated_at: new Date().toISOString()
+    };
+    
+    // Only include fields that are provided
+    if (body.title !== undefined) updateData.title = body.title;
+    if (body.project_id !== undefined) updateData.project_id = body.project_id;
+    if (body.status !== undefined) updateData.status = body.status;
+    if (body.description !== undefined) updateData.description = body.description;
+    if (body.due_date !== undefined) updateData.due_date = body.due_date;
+    if (body.completed_date !== undefined) updateData.completed_date = body.completed_date;
+    if (body.links !== undefined) updateData.links = body.links || [];
+    if (body.tags !== undefined) updateData.tags = body.tags || [];
+    if (body.remarks !== undefined) updateData.remarks = body.remarks;
+    if (body.owner !== undefined) updateData.owner = body.owner;
+    if (body.department !== undefined) updateData.department = body.department;
+    
+    // Handle priority and flags
+    if (body.priority !== undefined) {
+      updateData.priority = body.priority;
+      updateData.is_urgent = body.priority === 'urgent_important' || body.priority === 'urgent_not_important';
+      updateData.is_important = body.priority === 'urgent_important' || body.priority === 'not_urgent_important';
+    }
     
     const { data, error } = await supabase
       .from('tasks')
-      .update({
-        title,
-        project_id,
-        status,
-        priority,
-        is_urgent,
-        is_important,
-        description,
-        due_date,
-        links: links || [],
-        tags: tags || [],
-        remarks,
-        updated_at: new Date().toISOString()
-      })
+      .update(updateData)
       .eq('id', id)
       .select()
       .single()
