@@ -40,11 +40,38 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onAdd, cur
 
   if (!isOpen) return null;
 
+  const isValidURL = (url: string): boolean => {
+    try {
+      new URL(url);
+      return true;
+    } catch {
+      return false;
+    }
+  };
+
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
     
+    // Title validation
     if (!formData.title.trim()) {
       newErrors.title = 'Title is required';
+    } else if (formData.title.length > 500) {
+      newErrors.title = 'Title must be 500 characters or less';
+    }
+    
+    // Description validation
+    if (formData.description.length > 5000) {
+      newErrors.description = 'Description must be 5000 characters or less';
+    }
+    
+    // Links validation
+    if (formData.links.length > 50) {
+      newErrors.links = 'Maximum 50 links allowed';
+    }
+    
+    // Tags validation
+    if (formData.tags.length > 50) {
+      newErrors.tags = 'Maximum 50 tags allowed';
     }
     
     setErrors(newErrors);
@@ -94,13 +121,35 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onAdd, cur
   };
 
   const addLink = () => {
-    if (linkInput.trim() && !formData.links.includes(linkInput.trim())) {
-      setFormData(prev => ({
-        ...prev,
-        links: [...prev.links, linkInput.trim()]
-      }));
-      setLinkInput('');
+    const trimmedLink = linkInput.trim();
+    
+    if (!trimmedLink) return;
+    
+    // Validate URL format
+    if (!isValidURL(trimmedLink)) {
+      setErrors(prev => ({ ...prev, linkInput: 'Please enter a valid URL (e.g., https://example.com)' }));
+      return;
     }
+    
+    if (formData.links.includes(trimmedLink)) {
+      setErrors(prev => ({ ...prev, linkInput: 'This link is already added' }));
+      return;
+    }
+    
+    if (formData.links.length >= 50) {
+      setErrors(prev => ({ ...prev, linkInput: 'Maximum 50 links allowed' }));
+      return;
+    }
+    
+    setFormData(prev => ({
+      ...prev,
+      links: [...prev.links, trimmedLink]
+    }));
+    setLinkInput('');
+    setErrors(prev => {
+      const { linkInput, ...rest } = prev;
+      return rest;
+    });
   };
 
   const removeLink = (index: number) => {
@@ -111,13 +160,29 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onAdd, cur
   };
 
   const addTag = () => {
-    if (tagInput.trim() && !formData.tags.includes(tagInput.trim())) {
-      setFormData(prev => ({
-        ...prev,
-        tags: [...prev.tags, tagInput.trim()]
-      }));
-      setTagInput('');
+    const trimmedTag = tagInput.trim();
+    
+    if (!trimmedTag) return;
+    
+    if (formData.tags.includes(trimmedTag)) {
+      setErrors(prev => ({ ...prev, tagInput: 'This tag is already added' }));
+      return;
     }
+    
+    if (formData.tags.length >= 50) {
+      setErrors(prev => ({ ...prev, tagInput: 'Maximum 50 tags allowed' }));
+      return;
+    }
+    
+    setFormData(prev => ({
+      ...prev,
+      tags: [...prev.tags, trimmedTag]
+    }));
+    setTagInput('');
+    setErrors(prev => {
+      const { tagInput, ...rest } = prev;
+      return rest;
+    });
   };
 
   const removeTag = (index: number) => {
@@ -153,12 +218,13 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onAdd, cur
           {/* Title */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Title *
+              Title * <span className="text-gray-500 text-xs">({formData.title.length}/500)</span>
             </label>
             <input
               type="text"
               value={formData.title}
               onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
+              maxLength={500}
               className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder:text-gray-800 placeholder:font-medium ${
                 errors.title ? 'border-red-300' : 'border-gray-300'
               }`}
@@ -190,15 +256,21 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onAdd, cur
           {/* Description */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Description
+              Description <span className="text-gray-500 text-xs">({formData.description.length}/5000)</span>
             </label>
             <textarea
               value={formData.description}
               onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
+              maxLength={5000}
               rows={3}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder:text-gray-800 placeholder:font-medium"
+              className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder:text-gray-800 placeholder:font-medium ${
+                errors.description ? 'border-red-300' : 'border-gray-300'
+              }`}
               placeholder="Enter task description..."
             />
+            {errors.description && (
+              <p className="text-red-500 text-sm mt-1">{errors.description}</p>
+            )}
           </div>
 
           {/* Status Info and Priority */}
@@ -251,15 +323,23 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onAdd, cur
           {/* Links */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Links
+              Links <span className="text-gray-500 text-xs">({formData.links.length}/50)</span>
             </label>
             <div className="flex gap-2 mb-3">
               <input
                 type="url"
                 value={linkInput}
-                onChange={(e) => setLinkInput(e.target.value)}
+                onChange={(e) => {
+                  setLinkInput(e.target.value);
+                  setErrors(prev => {
+                    const { linkInput, ...rest } = prev;
+                    return rest;
+                  });
+                }}
                 onKeyPress={(e) => handleKeyPress(e, addLink)}
-                className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder:text-gray-800 placeholder:font-medium"
+                className={`flex-1 px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder:text-gray-800 placeholder:font-medium ${
+                  errors.linkInput ? 'border-red-300' : 'border-gray-300'
+                }`}
                 placeholder="https://example.com"
               />
               <button
@@ -270,6 +350,12 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onAdd, cur
                 <PlusIcon className="w-5 h-5" />
               </button>
             </div>
+            {errors.linkInput && (
+              <p className="text-red-500 text-sm mb-2">{errors.linkInput}</p>
+            )}
+            {errors.links && (
+              <p className="text-red-500 text-sm mb-2">{errors.links}</p>
+            )}
             {formData.links.length > 0 && (
               <div className="space-y-2">
                 {formData.links.map((link, index) => (
@@ -291,15 +377,23 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onAdd, cur
           {/* Tags */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
-              Tags
+              Tags <span className="text-gray-500 text-xs">({formData.tags.length}/50)</span>
             </label>
             <div className="flex gap-2 mb-3">
               <input
                 type="text"
                 value={tagInput}
-                onChange={(e) => setTagInput(e.target.value)}
+                onChange={(e) => {
+                  setTagInput(e.target.value);
+                  setErrors(prev => {
+                    const { tagInput, ...rest } = prev;
+                    return rest;
+                  });
+                }}
                 onKeyPress={(e) => handleKeyPress(e, addTag)}
-                className="flex-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder:text-gray-800 placeholder:font-medium"
+                className={`flex-1 px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder:text-gray-800 placeholder:font-medium ${
+                  errors.tagInput ? 'border-red-300' : 'border-gray-300'
+                }`}
                 placeholder="urgent, meeting, research"
               />
               <button
@@ -310,6 +404,12 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onAdd, cur
                 <PlusIcon className="w-5 h-5" />
               </button>
             </div>
+            {errors.tagInput && (
+              <p className="text-red-500 text-sm mb-2">{errors.tagInput}</p>
+            )}
+            {errors.tags && (
+              <p className="text-red-500 text-sm mb-2">{errors.tags}</p>
+            )}
             {formData.tags.length > 0 && (
               <div className="flex flex-wrap gap-2">
                 {formData.tags.map((tag, index) => (

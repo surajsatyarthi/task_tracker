@@ -25,6 +25,7 @@ export default function TaskTracker() {
   const [showTaskModal, setShowTaskModal] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [operationLoading, setOperationLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
 
@@ -161,7 +162,9 @@ export default function TaskTracker() {
   };
 
   const handleTaskUpdate = async (updatedTask: Task) => {
+    if (operationLoading) return;
     try {
+      setOperationLoading(true);
       const token = await supabase.auth.getSession();
       const response = await fetch(`/api/tasks/${updatedTask.id}`, {
         method: 'PUT',
@@ -183,11 +186,15 @@ export default function TaskTracker() {
     } catch (error) {
       console.error('Error updating task:', error);
       setError(error instanceof Error ? error.message : 'Failed to update task');
+    } finally {
+      setOperationLoading(false);
     }
   };
 
   const handleTaskCreate = async (newTask: Omit<Task, 'id' | 'created_at' | 'updated_at'>) => {
+    if (operationLoading) return;
     try {
+      setOperationLoading(true);
       const token = await supabase.auth.getSession();
       const response = await fetch('/api/tasks', {
         method: 'POST',
@@ -206,11 +213,15 @@ export default function TaskTracker() {
     } catch (error) {
       console.error('Error creating task:', error);
       setError('Failed to create task');
+    } finally {
+      setOperationLoading(false);
     }
   };
 
   const handleTaskDelete = async (taskId: string) => {
+    if (operationLoading) return;
     try {
+      setOperationLoading(true);
       const token = await supabase.auth.getSession();
       const response = await fetch(`/api/tasks/${taskId}`, {
         method: 'DELETE',
@@ -226,17 +237,20 @@ export default function TaskTracker() {
     } catch (error) {
       console.error('Error deleting task:', error);
       setError('Failed to delete task');
+    } finally {
+      setOperationLoading(false);
     }
   };
 
   const handlePriorityChange = async (taskId: string, newPriority: TaskPriority) => {
     const task = tasks.find(t => t.id === taskId);
-    if (!task) return;
+    if (!task || operationLoading) return;
 
     // Only send the changed fields for better performance
     const updates = { priority: newPriority };
     
     try {
+      setOperationLoading(true);
       const token = await supabase.auth.getSession();
       const response = await fetch(`/api/tasks/${taskId}`, {
         method: 'PUT',
@@ -258,12 +272,14 @@ export default function TaskTracker() {
     } catch (error) {
       console.error('Error updating task priority:', error);
       setError(error instanceof Error ? error.message : 'Failed to update task');
+    } finally {
+      setOperationLoading(false);
     }
   };
 
   const handleStatusChange = async (taskId: string, newStatus: string) => {
     const task = tasks.find(t => t.id === taskId);
-    if (!task) return;
+    if (!task || operationLoading) return;
 
     // Only send the changed fields
     const updates = { status: newStatus as TaskStatus };
