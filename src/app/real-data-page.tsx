@@ -11,23 +11,22 @@ import JournalDashboard from '@/components/JournalDashboard';
 import { useAuth, supabase } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import { Task, TaskStatus, TaskPriority, Project } from '@/types/task';
-import { Squares2X2Icon, TableCellsIcon, CalendarIcon, ArchiveBoxIcon } from '@heroicons/react/24/outline';
+import { Squares2X2Icon, TableCellsIcon, CalendarIcon } from '@heroicons/react/24/outline';
 import { LoadingSpinner, LoadingSkeleton } from '@/components/LoadingStates';
 
 export default function TaskTracker() {
   const { user, signOut } = useAuth();
-  const router = useRouter();
   const [tasks, setTasks] = useState<Task[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
   const [activeProject, setActiveProject] = useState<string>('personal');
   const [viewMode, setViewMode] = useState<'matrix' | 'table' | 'calendar'>('matrix');
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
-  const [showTaskModal, setShowTaskModal] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
   const [loading, setLoading] = useState(true);
   const [operationLoading, setOperationLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [projectCounts, setProjectCounts] = useState<Record<string, number>>({});
 
   const fetchProjects = useCallback(async () => {
     try {
@@ -40,7 +39,25 @@ export default function TaskTracker() {
       if (!response.ok) throw new Error('Failed to fetch projects');
       
       const data = await response.json();
-      setProjects(data.projects || []);
+      const fetchedProjects = data.projects || [];
+      setProjects(fetchedProjects);
+
+      // Fetch task counts for all projects
+      const counts: Record<string, number> = {};
+      for (const project of fetchedProjects) {
+        const taskResponse = await fetch(`/api/tasks?project=${project.slug}`, {
+          headers: {
+            'Authorization': `Bearer ${token.data.session?.access_token}`,
+          },
+        });
+        if (taskResponse.ok) {
+          const taskData = await taskResponse.json();
+          counts[project.id] = (taskData.tasks || []).length;
+        } else {
+          counts[project.id] = 0;
+        }
+      }
+      setProjectCounts(counts);
     } catch (error) {
       console.error('Error fetching projects:', error);
       setError('Failed to load projects');
@@ -330,9 +347,9 @@ export default function TaskTracker() {
     );
   });
 
-  // Count tasks per project
+  // Count tasks per project from cached counts
   const getTaskCountForProject = (projectId: string) => {
-    return tasks.filter(task => task.project_id === projectId).length;
+    return projectCounts[projectId] || 0;
   };
 
   if (loading) {

@@ -37,11 +37,19 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, isDragging = false, onClick, 
   return (
     <div
       className={`
-        bg-white rounded-lg border p-4 cursor-pointer hover:shadow-lg transition-all duration-200 relative
+        bg-white rounded-lg border p-4 cursor-pointer hover:shadow-lg transition-all duration-200 relative min-h-[44px]
         ${isDragging ? 'shadow-2xl border-blue-300' : 'hover:border-gray-300'}
         ${isOverdue ? 'border-red-300 bg-red-50 shadow-red-100 shadow-md' : 'border-gray-200'}
       `}
       onClick={onClick}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onClick?.();
+        }
+      }}
     >
       {/* Overdue Warning */}
       {isOverdue && (

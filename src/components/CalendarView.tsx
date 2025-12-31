@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useMemo } from 'react';
-import { Task, priorityColorMap, statusIconMap } from '@/types/task';
+import { Task, priorityColorMap } from '@/types/task';
 import { CalendarIcon, ClockIcon } from '@heroicons/react/24/outline';
 import { CheckCircleIcon, ExclamationCircleIcon } from '@heroicons/react/24/solid';
 
@@ -40,7 +40,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({ tasks, onTaskClick, highlig
     );
   };
 
-  const { calendarDays, dateRange, monthHeaders } = useMemo(() => {
+  const { calendarDays, dateRange, monthHeaders, rangeStart, rangeEnd } = useMemo(() => {
     // Always show current year's calendar
     const now = new Date();
     const currentYear = now.getFullYear();
@@ -101,7 +101,9 @@ const CalendarView: React.FC<CalendarViewProps> = ({ tasks, onTaskClick, highlig
     return {
       calendarDays: days,
       monthHeaders: headers,
-      dateRange: `${START_DATE.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })} - ${END_DATE.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}`
+      dateRange: `${START_DATE.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })} - ${END_DATE.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}`,
+      rangeStart: START_DATE,
+      rangeEnd: END_DATE
     };
   }, [tasks]);
 
@@ -129,12 +131,6 @@ const CalendarView: React.FC<CalendarViewProps> = ({ tasks, onTaskClick, highlig
   };
 
   const tasksWithDueDates = tasks.filter(task => task.due_date).length;
-
-  // Calculate tasks in range dynamically using UTC
-  const now = new Date();
-  const currentYear = now.getFullYear();
-  const rangeStart = new Date(Date.UTC(currentYear, 0, 1));
-  const rangeEnd = new Date(Date.UTC(currentYear, 11, 31, 23, 59, 59));
 
   const tasksInRange = tasks.filter(task => {
     if (!task.due_date) return false;

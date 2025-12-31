@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Task, TaskStatus, statusConfig, getTodayDate } from '@/types/task';
+import { Task, TaskStatus, TaskPriority, statusConfig, getTodayDate } from '@/types/task';
 import { XMarkIcon } from '@heroicons/react/24/outline';
 import LinkPreview from './LinkPreview';
 
@@ -134,10 +134,25 @@ const TaskDetailModal: React.FC<TaskDetailModalProps> = ({ task, isOpen, onClose
 
             <div>
               <label className="block text-sm font-bold text-gray-900 mb-2">Priority</label>
-              <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold ${priorityStyle.color}`}>
-                <span className="mr-2">{priorityStyle.icon}</span>
-                {priorityStyle.label}
-              </span>
+              {isEditing ? (
+                <select
+                  value={editedTask.priority || task.priority}
+                  onChange={(e) => setEditedTask({ ...editedTask, priority: e.target.value as TaskPriority })}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 font-medium"
+                  aria-label="Task priority"
+                >
+                  {Object.entries(priorityConfig).map(([priority, config]) => (
+                    <option key={priority} value={priority}>
+                      {config.icon} {config.label}
+                    </option>
+                  ))}
+                </select>
+              ) : (
+                <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold ${priorityStyle.color}`}>
+                  <span className="mr-2">{priorityStyle.icon}</span>
+                  {priorityStyle.label}
+                </span>
+              )}
             </div>
 
             <div>

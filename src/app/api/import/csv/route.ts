@@ -175,7 +175,11 @@ export const POST = requireAuth(async (request: NextRequest, user) => {
     }
 
     return NextResponse.json({ imported: filtered.length })
-  } catch {
-    return NextResponse.json({ error: 'Import failed' }, { status: 500 })
+  } catch (error) {
+    console.error('CSV import error:', error);
+    return NextResponse.json({
+      error: 'Import failed',
+      details: error instanceof Error ? error.message : 'Unknown error'
+    }, { status: 500 })
   }
 })

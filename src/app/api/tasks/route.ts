@@ -41,6 +41,14 @@ export const POST = requireAuth(async (request: NextRequest, user) => {
     if (!title || !project_id) {
       return NextResponse.json({ error: 'Title and project_id are required' }, { status: 400 })
     }
+
+    if (title.length > 500) {
+      return NextResponse.json({ error: 'Title must be 500 characters or less' }, { status: 400 })
+    }
+
+    if (description && description.length > 5000) {
+      return NextResponse.json({ error: 'Description must be 5000 characters or less' }, { status: 400 })
+    }
     
     // Parse priority to get flags
     const is_urgent = priority === 'urgent_important' || priority === 'urgent_not_important'

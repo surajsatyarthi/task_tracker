@@ -20,14 +20,24 @@ export async function PUT(
     };
     
     // Only include fields that are provided
-    if (body.title !== undefined) updateData.title = body.title;
+    if (body.title !== undefined) {
+      if (body.title.length > 500) {
+        return NextResponse.json({ error: 'Title must be 500 characters or less' }, { status: 400 })
+      }
+      updateData.title = body.title;
+    }
     if (body.project_id !== undefined) updateData.project_id = body.project_id;
     if (body.status !== undefined) updateData.status = body.status;
-    if (body.description !== undefined) updateData.description = body.description;
+    if (body.description !== undefined) {
+      if (body.description.length > 5000) {
+        return NextResponse.json({ error: 'Description must be 5000 characters or less' }, { status: 400 })
+      }
+      updateData.description = body.description;
+    }
     if (body.due_date !== undefined) updateData.due_date = body.due_date;
     if (body.completed_date !== undefined) updateData.completed_date = body.completed_date;
-    if (body.links !== undefined) updateData.links = body.links || [];
-    if (body.tags !== undefined) updateData.tags = body.tags || [];
+    if (body.links !== undefined) updateData.links = body.links;
+    if (body.tags !== undefined) updateData.tags = body.tags;
     if (body.remarks !== undefined) updateData.remarks = body.remarks;
     if (body.owner !== undefined) updateData.owner = body.owner;
     if (body.department !== undefined) updateData.department = body.department;

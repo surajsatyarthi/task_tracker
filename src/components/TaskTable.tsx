@@ -171,7 +171,8 @@ const TaskTable: React.FC<TaskTableProps> = ({ tasks, onTaskClick, highlight }) 
                           e.stopPropagation();
                           onTaskClick(task);
                         }}
-                        className="text-blue-600 hover:text-blue-900 text-xs"
+                        className="text-blue-600 hover:text-blue-900 text-xs px-3 py-2 min-h-[44px] sm:min-h-0 flex items-center justify-center"
+                        aria-label={`View details for ${task.title}`}
                       >
                         View
                       </button>

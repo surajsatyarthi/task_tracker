@@ -22,34 +22,51 @@ const LinkPreview: React.FC<LinkPreviewProps> = ({ url, className = '' }) => {
   const [error, setError] = useState<string | null>(null);
 
   // Extract domain from URL
-  const domain = url ? new URL(url).hostname : '';
+  const domain = (() => {
+    try {
+      return url ? new URL(url).hostname : '';
+    } catch {
+      return '';
+    }
+  })();
 
   useEffect(() => {
+    let cancelled = false;
+
     const run = async () => {
       if (!showPreview) return;
       if (metadata || loading) return;
-      setLoading(true);
-      setError(null);
+
+      if (!cancelled) setLoading(true);
+      if (!cancelled) setError(null);
+
       try {
         const response = await fetch(`/api/link-preview?url=${encodeURIComponent(url)}`);
-        if (response.ok) {
-          const data = await response.json();
-          setMetadata(data);
-        } else {
-          setMetadata({ domain, title: url.split('/').pop() || url });
+        if (!cancelled) {
+          if (response.ok) {
+            const data = await response.json();
+            setMetadata(data);
+          } else {
+            setMetadata({ domain, title: url.split('/').pop() || url });
+          }
         }
       } catch (err) {
-        console.error('Failed to fetch link metadata:', err);
-        setError('Failed to load preview');
-        setMetadata({ domain, title: url.split('/').pop() || url });
+        if (!cancelled) {
+          console.error('Failed to fetch link metadata:', err);
+          setError('Failed to load preview');
+          setMetadata({ domain, title: url.split('/').pop() || url });
+        }
       } finally {
-        setLoading(false);
+        if (!cancelled) setLoading(false);
       }
     };
-    run();
-  }, [showPreview, url, domain, metadata, loading]);
 
-  const fetchLinkMetadata = async () => {};
+    run();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [showPreview, url, metadata, loading]);
 
   const getDisplayUrl = () => {
     try {

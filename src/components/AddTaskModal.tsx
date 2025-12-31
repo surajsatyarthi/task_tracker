@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState } from 'react';
-import { Task, TaskPriority, getFlagsFromPriority, getTodayDate, priorityConfig } from '@/types/task';
+import React, { useState, useEffect } from 'react';
+import { Task, TaskPriority, getFlagsFromPriority, getTodayDate, priorityConfig, Project } from '@/types/task';
 import { XMarkIcon, PlusIcon } from '@heroicons/react/24/outline';
 
 interface AddTaskModalProps {
@@ -9,34 +9,59 @@ interface AddTaskModalProps {
   onClose: () => void;
   onAdd: (task: Omit<Task, 'id' | 'created_at' | 'updated_at'>) => void;
   currentProject: string;
+  projects: Project[];
 }
 
-// Available projects for task creation
-const AVAILABLE_PROJECTS = [
-  { id: 'personal', name: 'Personal', color: '#6366f1' },
-  { id: 'csuite', name: 'CSuite', color: '#dc2626' },
-];
-
-const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onAdd, currentProject }) => {
-  // Ensure the current project is one of the available projects, default to personal
-  const getValidProject = (projectId: string) => {
-    return AVAILABLE_PROJECTS.find(p => p.id === projectId) ? projectId : 'personal';
-  };
-
+const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onAdd, currentProject, projects }) => {
   const [formData, setFormData] = useState({
     title: '',
     description: '',
     priority: 'not_urgent_not_important' as TaskPriority,
-    project_id: getValidProject(currentProject),
+    project_id: '',
     remarks: '',
     links: [] as string[],
     tags: [] as string[],
     due_date: '',
   });
-  
+
   const [linkInput, setLinkInput] = useState('');
   const [tagInput, setTagInput] = useState('');
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  // Update project_id when currentProject or projects change
+  useEffect(() => {
+    const project = projects.find(p => p.slug === currentProject);
+    const projectId = project?.id || projects[0]?.id || '';
+
+    setFormData(prev => {
+      if (prev.project_id !== projectId) {
+        return { ...prev, project_id: projectId };
+      }
+      return prev;
+    });
+  }, [currentProject, projects]);
+
+  // Reset form when modal closes
+  useEffect(() => {
+    if (!isOpen) {
+      const project = projects.find(p => p.slug === currentProject);
+      const projectId = project?.id || projects[0]?.id || '';
+
+      setFormData({
+        title: '',
+        description: '',
+        priority: 'not_urgent_not_important',
+        project_id: projectId,
+        remarks: '',
+        links: [],
+        tags: [],
+        due_date: '',
+      });
+      setLinkInput('');
+      setTagInput('');
+      setErrors({});
+    }
+  }, [isOpen, currentProject, projects]);
 
   if (!isOpen) return null;
 
@@ -105,11 +130,14 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onAdd, cur
   };
 
   const handleReset = () => {
+    const project = projects.find(p => p.slug === currentProject);
+    const projectId = project?.id || projects[0]?.id || '';
+
     setFormData({
       title: '',
       description: '',
       priority: 'not_urgent_not_important',
-      project_id: getValidProject(currentProject),
+      project_id: projectId,
       remarks: '',
       links: [],
       tags: [],
@@ -200,21 +228,23 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onAdd, cur
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-      <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto">
+    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-2 sm:p-4 z-50">
+      <div className="bg-white rounded-lg max-w-2xl w-full mx-2 sm:mx-0 max-h-[95vh] sm:max-h-[90vh] overflow-y-auto">
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-gray-200">
-          <h2 className="text-xl font-semibold text-gray-900">Add New Task</h2>
+        <div className="flex items-center justify-between p-4 sm:p-6 border-b border-gray-200 sticky top-0 bg-white z-10">
+          <h2 className="text-lg sm:text-xl font-semibold text-gray-900">Add New Task</h2>
           <button
+            type="button"
             onClick={onClose}
-            className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-md transition-colors"
+            className="p-2 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-md transition-colors min-h-[44px] min-w-[44px] flex items-center justify-center"
+            aria-label="Close modal"
           >
             <XMarkIcon className="w-5 h-5" />
           </button>
         </div>
 
         {/* Form */}
-        <form onSubmit={handleSubmit} className="p-6 space-y-6">
+        <form onSubmit={handleSubmit} className="p-4 sm:p-6 space-y-4 sm:space-y-6">
           {/* Title */}
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">
@@ -245,7 +275,7 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onAdd, cur
               onChange={(e) => setFormData(prev => ({ ...prev, project_id: e.target.value }))}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 font-medium"
             >
-              {AVAILABLE_PROJECTS.map((project) => (
+              {projects.filter(p => p.slug === 'personal' || p.slug === 'csuite').map((project) => (
                 <option key={project.id} value={project.id}>
                   {project.name}
                 </option>
@@ -446,17 +476,17 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onAdd, cur
           </div>
 
           {/* Footer */}
-          <div className="flex items-center justify-end gap-3 pt-6 border-t border-gray-200">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-end gap-2 sm:gap-3 pt-4 sm:pt-6 border-t border-gray-200 sticky bottom-0 bg-white -mx-4 sm:-mx-6 px-4 sm:px-6 pb-4 sm:pb-0">
             <button
               type="button"
               onClick={onClose}
-              className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors"
+              className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-md transition-colors min-h-[44px] order-2 sm:order-1"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="px-4 py-2 text-sm font-medium text-white bg-green-600 hover:bg-green-700 rounded-md transition-colors"
+              className="px-4 py-2 text-sm font-medium text-white bg-green-600 hover:bg-green-700 rounded-md transition-colors min-h-[44px] order-1 sm:order-2"
             >
               Add Task
             </button>
