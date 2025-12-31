@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import EisenhowerMatrix from '@/components/EisenhowerMatrix';
 import TaskTable from '@/components/TaskTable';
 import CalendarView from '@/components/CalendarView';
@@ -20,7 +20,6 @@ export default function TaskTracker() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
   const [activeProject, setActiveProject] = useState<string>('personal');
-  const [categoryFilter, setCategoryFilter] = useState<'personal' | 'csuite'>('personal');
   const [viewMode, setViewMode] = useState<'matrix' | 'table' | 'calendar'>('matrix');
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
   const [showTaskModal, setShowTaskModal] = useState(false);
@@ -30,19 +29,7 @@ export default function TaskTracker() {
   const [error, setError] = useState<string | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
 
-  // Fetch projects on mount
-  useEffect(() => {
-    fetchProjects();
-  }, []);
-
-  // Fetch tasks when active project changes
-  useEffect(() => {
-    if (projects.length > 0) {
-      fetchTasks();
-    }
-  }, [activeProject, projects]);
-
-  const fetchProjects = async () => {
+  const fetchProjects = useCallback(async () => {
     try {
       const token = await supabase.auth.getSession();
       const response = await fetch('/api/projects', {
@@ -58,9 +45,9 @@ export default function TaskTracker() {
       console.error('Error fetching projects:', error);
       setError('Failed to load projects');
     }
-  };
+  }, []);
 
-  const fetchTasks = async () => {
+  const fetchTasks = useCallback(async () => {
     try {
       setLoading(true);
       const token = await supabase.auth.getSession();
@@ -152,7 +139,20 @@ export default function TaskTracker() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [activeProject]);
+
+  // Fetch projects on mount
+  useEffect(() => {
+    fetchProjects();
+  }, [fetchProjects]);
+
+  // Fetch tasks when active project changes
+  useEffect(() => {
+    if (projects.length > 0) {
+      fetchTasks();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [activeProject, projects.length]);
 
   const handleTaskUpdateById = (taskId: string, updates: Partial<Task>) => {
     const task = tasks.find(t => t.id === taskId);
@@ -282,40 +282,42 @@ export default function TaskTracker() {
     const task = tasks.find(t => t.id === taskId);
     if (!task || operationLoading) return;
 
+    setOperationLoading(true);
+
     // Only send the changed fields
     const updates = { status: newStatus as TaskStatus };
-    
+
     try {
       const token = await supabase.auth.getSession();
       const response = await fetch(`/api/tasks/${taskId}`, {
         method: 'PUT',
-        headers: { 
+        headers: {
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token.data.session?.access_token}`,
         },
         body: JSON.stringify(updates),
       });
-      
+
       if (!response.ok) {
         const errorData = await response.json();
         console.error('Update error:', errorData);
         throw new Error(errorData.error || 'Failed to update task');
       }
-      
+
       // Refresh tasks
       await fetchTasks();
     } catch (error) {
       console.error('Error updating task status:', error);
       setError(error instanceof Error ? error.message : 'Failed to update task');
+    } finally {
+      setOperationLoading(false);
     }
   };
 
   const currentProject = projects.find(p => p.slug === activeProject);
-  
-  // Filter tasks by category (personal/csuite) and search query
+
+  // Filter tasks by search query only (project filtering happens at API level)
   const filteredTasks = tasks.filter(task => {
-    const matchesCategory = task.project_id === categoryFilter;
-    if (!matchesCategory) return false;
     if (!searchQuery.trim()) return true;
     const query = searchQuery.toLowerCase();
     return (
@@ -393,12 +395,12 @@ export default function TaskTracker() {
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
       <div className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <h1 className="text-2xl font-bold text-gray-900">Task Tracker Pro</h1>
-            <div className="flex items-center space-x-4">
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8">
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 py-3 sm:py-0 sm:h-16">
+            <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Task Tracker Pro</h1>
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 sm:gap-3">
               {/* Search Input */}
-              <div className="relative">
+              <div className="relative flex-1 sm:flex-initial">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <svg className="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
@@ -409,43 +411,45 @@ export default function TaskTracker() {
                   placeholder="Search tasks..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="block w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                  style={{ width: '300px' }}
+                  className="block w-full sm:w-auto pl-10 pr-10 py-2 border border-gray-300 rounded-md leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 text-base sm:text-sm min-h-[44px] sm:min-h-0"
+                  style={{ width: 'auto', minWidth: '100%', maxWidth: '300px' }}
                 />
                 {searchQuery && (
                   <button
                     onClick={() => setSearchQuery('')}
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center min-h-[44px] sm:min-h-0"
+                    aria-label="Clear search"
                   >
-                    <svg className="h-4 w-4 text-gray-400 hover:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="h-5 w-5 text-gray-400 hover:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                     </svg>
                   </button>
                 )}
               </div>
-              <button
-                onClick={() => setShowAddModal(true)}
-                className="bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition-colors"
-              >
-                Add Task
-              </button>
-              {/* User Menu */}
-              <div className="relative">
+              <div className="flex items-center gap-2 sm:gap-3">
+                <button
+                  onClick={() => setShowAddModal(true)}
+                  className="flex-1 sm:flex-initial bg-indigo-600 text-white px-4 py-2 rounded-md hover:bg-indigo-700 transition-colors min-h-[44px] flex items-center justify-center font-medium"
+                >
+                  <span className="sm:inline">Add Task</span>
+                </button>
+                {/* User Menu */}
                 <button
                   onClick={() => {
                     if (window.confirm('Are you sure you want to sign out?')) {
                       signOut();
                     }
                   }}
-                  className="flex items-center space-x-2 text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md hover:bg-gray-100 transition-colors"
+                  className="flex items-center gap-2 text-gray-700 hover:text-gray-900 px-3 py-2 rounded-md hover:bg-gray-100 transition-colors min-h-[44px]"
+                  aria-label="Sign out"
                 >
-                  <div className="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center">
+                  <div className="w-8 h-8 bg-indigo-100 rounded-full flex items-center justify-center flex-shrink-0">
                     <span className="text-indigo-600 font-medium text-sm">
                       {user?.email?.charAt(0).toUpperCase()}
                     </span>
                   </div>
-                  <span className="text-sm font-medium">{user?.email}</span>
-                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <span className="text-sm font-medium hidden lg:inline truncate max-w-[150px]">{user?.email}</span>
+                  <svg className="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                   </svg>
                 </button>
@@ -455,56 +459,38 @@ export default function TaskTracker() {
         </div>
       </div>
 
-      {/* Category Filter and Project Tabs */}
+      {/* Project Tabs */}
       <div className="bg-white border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row md:items-center md:space-x-8">
-            {/* Category Filter */}
-            <div className="flex items-center space-x-2 py-2">
-              <span className="text-sm font-medium text-gray-700">Show:</span>
-              <button
-                className={`px-3 py-1 rounded-md text-sm font-semibold border ${categoryFilter === 'personal' ? 'bg-indigo-100 text-indigo-700 border-indigo-400' : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-50'}`}
-                onClick={() => setCategoryFilter('personal')}
-              >
-                Personal
-              </button>
-              <button
-                className={`px-3 py-1 rounded-md text-sm font-semibold border ${categoryFilter === 'csuite' ? 'bg-red-100 text-red-700 border-red-400' : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-50'}`}
-                onClick={() => setCategoryFilter('csuite')}
-              >
-                CSuite
-              </button>
-            </div>
-            {/* Project Tabs (optional, can be hidden if not needed) */}
-            <div className="flex space-x-8 overflow-x-auto mt-2 md:mt-0">
-              {projects.map((project) => {
-                const taskCount = getTaskCountForProject(project.id);
-                return (
-                  <button
-                    key={project.id}
-                    onClick={() => setActiveProject(project.slug)}
-                    className={`py-4 px-1 border-b-2 font-medium text-sm whitespace-nowrap flex items-center gap-2 ${
-                      activeProject === project.slug
-                        ? 'border-indigo-500 text-indigo-600'
-                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                    }`}
-                    style={{
-                      color: activeProject === project.slug ? project.color : undefined,
-                      borderColor: activeProject === project.slug ? project.color : undefined
-                    }}
-                  >
-                    <span>{project.name}</span>
-                    <span className={`px-2 py-1 text-xs rounded-full ${
-                      activeProject === project.slug 
-                        ? 'bg-white bg-opacity-20' 
-                        : 'bg-gray-100 text-gray-600'
-                    }`}>
-                      {taskCount}
-                    </span>
-                  </button>
-                );
-              })}
-            </div>
+        <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8">
+          <div className="flex gap-2 sm:gap-4 md:gap-8 overflow-x-auto scrollbar-hide pb-px">
+            {projects.map((project) => {
+              const taskCount = getTaskCountForProject(project.id);
+              return (
+                <button
+                  key={project.id}
+                  type="button"
+                  onClick={() => setActiveProject(project.slug)}
+                  className={`py-3 px-2 sm:py-4 sm:px-1 border-b-2 font-medium text-sm whitespace-nowrap flex items-center gap-1.5 sm:gap-2 min-h-[44px] sm:min-h-0 ${
+                    activeProject === project.slug
+                      ? 'border-indigo-500 text-indigo-600'
+                      : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                  }`}
+                  style={{
+                    color: activeProject === project.slug ? project.color : undefined,
+                    borderColor: activeProject === project.slug ? project.color : undefined
+                  }}
+                >
+                  <span className="text-sm sm:text-base">{project.name}</span>
+                  <span className={`px-1.5 py-0.5 sm:px-2 sm:py-1 text-xs rounded-full ${
+                    activeProject === project.slug
+                      ? 'bg-white bg-opacity-20'
+                      : 'bg-gray-100 text-gray-600'
+                  }`}>
+                    {taskCount}
+                  </span>
+                </button>
+              );
+            })}
           </div>
         </div>
       </div>
@@ -512,51 +498,55 @@ export default function TaskTracker() {
       {/* View Mode Toggle */}
       {!showSpecialDashboard && (
         <div className="bg-white border-b">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center justify-between py-4">
-              <div className="flex items-center space-x-4">
+          <div className="max-w-7xl mx-auto px-3 sm:px-4 lg:px-8">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 py-3 sm:py-4">
+              <div className="flex items-center gap-2 sm:gap-4">
                 <button
+                  type="button"
                   onClick={() => setViewMode('matrix')}
-                  className={`flex items-center px-3 py-2 rounded-md text-sm font-medium ${
+                  className={`flex items-center justify-center px-3 py-2 rounded-md text-sm font-medium min-h-[44px] sm:min-h-0 ${
                     viewMode === 'matrix'
                       ? 'bg-indigo-100 text-indigo-700'
-                      : 'text-gray-500 hover:text-gray-700'
+                      : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
                   }`}
                 >
-                  <Squares2X2Icon className="w-4 h-4 mr-2" />
-                  Matrix
+                  <Squares2X2Icon className="w-4 h-4 sm:mr-2" />
+                  <span className="hidden sm:inline">Matrix</span>
                 </button>
                 <button
+                  type="button"
                   onClick={() => setViewMode('table')}
-                  className={`flex items-center px-3 py-2 rounded-md text-sm font-medium ${
+                  className={`flex items-center justify-center px-3 py-2 rounded-md text-sm font-medium min-h-[44px] sm:min-h-0 ${
                     viewMode === 'table'
                       ? 'bg-indigo-100 text-indigo-700'
-                      : 'text-gray-500 hover:text-gray-700'
+                      : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
                   }`}
                 >
-                  <TableCellsIcon className="w-4 h-4 mr-2" />
-                  Table
+                  <TableCellsIcon className="w-4 h-4 sm:mr-2" />
+                  <span className="hidden sm:inline">Table</span>
                 </button>
                 <button
+                  type="button"
                   onClick={() => setViewMode('calendar')}
-                  className={`flex items-center px-3 py-2 rounded-md text-sm font-medium ${
+                  className={`flex items-center justify-center px-3 py-2 rounded-md text-sm font-medium min-h-[44px] sm:min-h-0 ${
                     viewMode === 'calendar'
                       ? 'bg-indigo-100 text-indigo-700'
-                      : 'text-gray-500 hover:text-gray-700'
+                      : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
                   }`}
                 >
-                  <CalendarIcon className="w-4 h-4 mr-2" />
-                  Calendar
+                  <CalendarIcon className="w-4 h-4 sm:mr-2" />
+                  <span className="hidden sm:inline">Calendar</span>
                 </button>
               </div>
-              <div className="text-sm text-gray-500">
+              <div className="text-xs sm:text-sm text-gray-500 text-center sm:text-right">
                 {searchQuery ? (
                   <>
-                    {filteredTasks.length} results for &ldquo;{searchQuery}&rdquo;
+                    <span className="block sm:inline">{filteredTasks.length} results for &ldquo;{searchQuery}&rdquo;</span>
                     {filteredTasks.length === 0 && (
                       <button
+                        type="button"
                         onClick={() => setSearchQuery('')}
-                        className="ml-2 text-indigo-600 hover:text-indigo-800"
+                        className="ml-2 text-indigo-600 hover:text-indigo-800 underline min-h-[44px] sm:min-h-0 inline-flex items-center"
                       >
                         Clear search
                       </button>
@@ -620,7 +610,8 @@ export default function TaskTracker() {
           isOpen={showAddModal}
           onClose={() => setShowAddModal(false)}
           onAdd={handleTaskCreate}
-          currentProject={currentProject?.id || ''}
+          currentProject={activeProject}
+          projects={projects}
         />
       )}
     </div>

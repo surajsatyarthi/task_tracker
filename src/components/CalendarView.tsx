@@ -45,8 +45,9 @@ const CalendarView: React.FC<CalendarViewProps> = ({ tasks, onTaskClick, highlig
     const now = new Date();
     const currentYear = now.getFullYear();
 
-    const START_DATE = new Date(`${currentYear}-01-01`);
-    const END_DATE = new Date(`${currentYear}-12-31`);
+    // Use UTC to avoid timezone issues
+    const START_DATE = new Date(Date.UTC(currentYear, 0, 1));
+    const END_DATE = new Date(Date.UTC(currentYear, 11, 31, 23, 59, 59));
 
     // Generate all days from START_DATE to END_DATE
     const days: CalendarDay[] = [];
@@ -57,9 +58,14 @@ const CalendarView: React.FC<CalendarViewProps> = ({ tasks, onTaskClick, highlig
     const startWeek = new Date(START_DATE);
     startWeek.setDate(startWeek.getDate() - startWeek.getDay());
 
-    // End on the Saturday of the week containing END_DATE
+    // End on the Saturday of the week containing END_DATE, but don't go past year boundary
     const endWeek = new Date(END_DATE);
     endWeek.setDate(endWeek.getDate() + (6 - endWeek.getDay()));
+    // Ensure we don't show next year's dates
+    const maxEndDate = new Date(Date.UTC(currentYear, 11, 31, 23, 59, 59));
+    if (endWeek > maxEndDate) {
+      endWeek.setTime(maxEndDate.getTime());
+    }
 
     let currentMonthIndex = -1;
     let dayIndex = 0;
@@ -124,11 +130,11 @@ const CalendarView: React.FC<CalendarViewProps> = ({ tasks, onTaskClick, highlig
 
   const tasksWithDueDates = tasks.filter(task => task.due_date).length;
 
-  // Calculate tasks in range dynamically
+  // Calculate tasks in range dynamically using UTC
   const now = new Date();
   const currentYear = now.getFullYear();
-  const rangeStart = new Date(`${currentYear}-01-01`);
-  const rangeEnd = new Date(`${currentYear}-12-31`);
+  const rangeStart = new Date(Date.UTC(currentYear, 0, 1));
+  const rangeEnd = new Date(Date.UTC(currentYear, 11, 31, 23, 59, 59));
 
   const tasksInRange = tasks.filter(task => {
     if (!task.due_date) return false;
