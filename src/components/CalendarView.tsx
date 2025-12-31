@@ -20,7 +20,7 @@ interface CalendarDay {
 }
 
 const CalendarView: React.FC<CalendarViewProps> = ({ tasks, onTaskClick, highlight }) => {
-  const escapeRegExp = (s: string) => s.replace(/[.*+?^${}()|[\\]\\]/g, '\\$&');
+  const escapeRegExp = (s: string) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   const renderWithHighlight = (text?: string) => {
     if (!text) return null;
     const q = (highlight || '').trim();
@@ -39,26 +39,29 @@ const CalendarView: React.FC<CalendarViewProps> = ({ tasks, onTaskClick, highlig
       </>
     );
   };
-  // Dynamic date range: Full current year
-  const currentYear = new Date().getFullYear();
-  const START_DATE = new Date(`${currentYear}-01-01`);
-  const END_DATE = new Date(`${currentYear}-12-31`);
 
   const { calendarDays, dateRange, monthHeaders } = useMemo(() => {
+    // Always show current year's calendar
+    const now = new Date();
+    const currentYear = now.getFullYear();
+
+    const START_DATE = new Date(`${currentYear}-01-01`);
+    const END_DATE = new Date(`${currentYear}-12-31`);
+
     // Generate all days from START_DATE to END_DATE
     const days: CalendarDay[] = [];
     const headers: { index: number; month: string }[] = [];
     const today = new Date().toISOString().split('T')[0];
-    
+
     // Start from the Sunday of the week containing START_DATE
     const startWeek = new Date(START_DATE);
     startWeek.setDate(startWeek.getDate() - startWeek.getDay());
-    
+
     // End on the Saturday of the week containing END_DATE
     const endWeek = new Date(END_DATE);
     endWeek.setDate(endWeek.getDate() + (6 - endWeek.getDay()));
-    
-    let currentMonth = -1;
+
+    let currentMonthIndex = -1;
     let dayIndex = 0;
     
     // Generate all calendar days
@@ -70,8 +73,8 @@ const CalendarView: React.FC<CalendarViewProps> = ({ tasks, onTaskClick, highlig
       const isInRange = date >= START_DATE && date <= END_DATE;
       
       // Add month header when month changes
-      if (date.getMonth() !== currentMonth && isInRange) {
-        currentMonth = date.getMonth();
+      if (date.getMonth() !== currentMonthIndex && isInRange) {
+        currentMonthIndex = date.getMonth();
         headers.push({
           index: dayIndex,
           month: date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
@@ -94,7 +97,7 @@ const CalendarView: React.FC<CalendarViewProps> = ({ tasks, onTaskClick, highlig
       monthHeaders: headers,
       dateRange: `${START_DATE.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })} - ${END_DATE.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}`
     };
-  }, [tasks, START_DATE, END_DATE]);
+  }, [tasks]);
 
   // Remove monthly navigation since we have a fixed 1-year range
   const goToStart = () => {
@@ -120,10 +123,17 @@ const CalendarView: React.FC<CalendarViewProps> = ({ tasks, onTaskClick, highlig
   };
 
   const tasksWithDueDates = tasks.filter(task => task.due_date).length;
+
+  // Calculate tasks in range dynamically
+  const now = new Date();
+  const currentYear = now.getFullYear();
+  const rangeStart = new Date(`${currentYear}-01-01`);
+  const rangeEnd = new Date(`${currentYear}-12-31`);
+
   const tasksInRange = tasks.filter(task => {
     if (!task.due_date) return false;
     const taskDate = new Date(task.due_date);
-    return taskDate >= START_DATE && taskDate <= END_DATE;
+    return taskDate >= rangeStart && taskDate <= rangeEnd;
   }).length;
 
   return (
