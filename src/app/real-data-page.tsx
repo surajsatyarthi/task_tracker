@@ -202,8 +202,8 @@ export default function TaskTracker() {
         throw new Error(errorData.error || 'Failed to update task');
       }
       
-      // Refresh tasks
-      await fetchTasks();
+      // Refresh both tasks and project counts
+      await Promise.all([fetchTasks(), fetchProjects()]);
     } catch (error) {
       console.error('Error updating task:', error);
       setError(error instanceof Error ? error.message : 'Failed to update task');
@@ -227,9 +227,9 @@ export default function TaskTracker() {
       });
       
       if (!response.ok) throw new Error('Failed to create task');
-      
-      // Refresh tasks
-      await fetchTasks();
+
+      // Refresh both tasks and project counts
+      await Promise.all([fetchTasks(), fetchProjects()]);
       setShowAddModal(false);
     } catch (error) {
       console.error('Error creating task:', error);
@@ -254,7 +254,7 @@ export default function TaskTracker() {
       if (!response.ok) throw new Error('Failed to delete task');
       
       // Refresh tasks
-      await fetchTasks();
+      await Promise.all([fetchTasks(), fetchProjects()]);
     } catch (error) {
       console.error('Error deleting task:', error);
       setError('Failed to delete task');

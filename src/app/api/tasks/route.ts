@@ -6,7 +6,7 @@ export const GET = requireAuth(async (request: NextRequest, user) => {
   try {
     const { searchParams } = new URL(request.url)
     const projectSlug = searchParams.get('project')
-    
+
     let query = supabase
       .from('tasks')
       .select(`
@@ -14,11 +14,24 @@ export const GET = requireAuth(async (request: NextRequest, user) => {
         projects(*)
       `)
       .order('created_at', { ascending: false })
-    
+
     if (projectSlug) {
-      query = query.eq('projects.slug', projectSlug)
+      // First get the project ID by slug for accurate filtering
+      const { data: project } = await supabase
+        .from('projects')
+        .select('id')
+        .eq('slug', projectSlug)
+        .eq('is_active', true)
+        .single()
+
+      if (project) {
+        query = query.eq('project_id', project.id)
+      } else {
+        // Project not found, return empty array
+        return NextResponse.json({ tasks: [] })
+      }
     }
-    
+
     const { data, error } = await query
     
     if (error) {
