@@ -42,19 +42,22 @@ export default function TaskTracker() {
       const fetchedProjects = data.projects || [];
       setProjects(fetchedProjects);
 
-      // Fetch task counts for all projects
+      // Fetch task counts for task ledger projects only (personal and csuite)
       const counts: Record<string, number> = {};
       for (const project of fetchedProjects) {
-        const taskResponse = await fetch(`/api/tasks?project=${project.slug}`, {
-          headers: {
-            'Authorization': `Bearer ${token.data.session?.access_token}`,
-          },
-        });
-        if (taskResponse.ok) {
-          const taskData = await taskResponse.json();
-          counts[project.id] = (taskData.tasks || []).length;
-        } else {
-          counts[project.id] = 0;
+        if (project.slug === 'personal' || project.slug === 'csuite') {
+          const taskResponse = await fetch(`/api/tasks?project=${project.slug}`, {
+            headers: {
+              'Authorization': `Bearer ${token.data.session?.access_token}`,
+            },
+          });
+          if (taskResponse.ok) {
+            const taskData = await taskResponse.json();
+            counts[project.id] = (taskData.tasks || []).length;
+            console.log(`Project ${project.slug} (${project.id}): ${counts[project.id]} tasks`);
+          } else {
+            counts[project.id] = 0;
+          }
         }
       }
       setProjectCounts(counts);
@@ -482,6 +485,7 @@ export default function TaskTracker() {
           <div className="flex gap-2 sm:gap-4 md:gap-8 overflow-x-auto scrollbar-hide pb-px">
             {projects.map((project) => {
               const taskCount = getTaskCountForProject(project.id);
+              const showTaskCount = project.slug === 'personal' || project.slug === 'csuite';
               return (
                 <button
                   key={project.id}
@@ -498,13 +502,15 @@ export default function TaskTracker() {
                   }}
                 >
                   <span className="text-sm sm:text-base">{project.name}</span>
-                  <span className={`px-1.5 py-0.5 sm:px-2 sm:py-1 text-xs rounded-full ${
-                    activeProject === project.slug
-                      ? 'bg-white bg-opacity-20'
-                      : 'bg-gray-100 text-gray-600'
-                  }`}>
-                    {taskCount}
-                  </span>
+                  {showTaskCount && (
+                    <span className={`px-1.5 py-0.5 sm:px-2 sm:py-1 text-xs rounded-full ${
+                      activeProject === project.slug
+                        ? 'bg-white bg-opacity-20'
+                        : 'bg-gray-100 text-gray-600'
+                    }`}>
+                      {taskCount}
+                    </span>
+                  )}
                 </button>
               );
             })}
