@@ -349,7 +349,7 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onAdd, cur
               </div>
             </div>
             <p className="text-xs text-gray-500 mt-1">
-              💡 Parkinson's Law: Set realistic time limits to stay focused
+              💡 Parkinson&apos;s Law: Set realistic time limits to stay focused
             </p>
           </div>
 
