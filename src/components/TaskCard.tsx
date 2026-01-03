@@ -106,6 +106,14 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, isDragging = false, onClick, 
           </div>
         )}
         
+        {/* Tracked Time Badge */}
+        {(task.timer_minutes > 0 || task.manual_minutes > 0) && (
+          <div className="flex items-center gap-1 text-green-600">
+            <span>⏲️</span>
+            <span>{formatMinutes(task.timer_minutes + task.manual_minutes)} tracked</span>
+          </div>
+        )}
+        
         {task.owner && (
           <div className="flex items-center gap-1">
             <UserIcon className="w-3 h-3" />
