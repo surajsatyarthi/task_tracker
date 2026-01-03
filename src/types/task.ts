@@ -26,6 +26,14 @@ export interface Task {
   due_date?: string;
   completed_date?: string;
   
+  // Time Tracking
+  estimated_minutes?: number;      // User's estimate in minutes
+  timer_minutes: number;           // Timer-tracked time
+  manual_minutes: number;          // Manually entered time
+  timer_started_at?: string;       // ISO timestamp
+  timer_running: boolean;          // Is timer active
+  last_timer_sync?: string;        // ISO timestamp
+  
   // Additional Data
   remarks?: string;
   links?: string[];
@@ -210,3 +218,48 @@ export const parseCSVPriority = (priority: string): TaskPriority => {
   
   return getPriorityFromFlags(isUrgent, isImportant);
 };
+
+// Time Tracking Helper Types
+export interface TaskTimerState {
+  isRunning: boolean;
+  estimatedMinutes: number | null;
+  actualMinutes: number;           // timer_minutes + manual_minutes
+  elapsedMinutes: number;          // Current session time
+  percentageUsed: number;          // (actual / estimated) * 100
+  startedAt: Date | null;
+}
+
+export type TimeComparisonStatus = 'under' | 'near' | 'over' | 'unknown';
+
+// Time Tracking Helper Functions
+export function getTimeComparisonStatus(task: Task): TimeComparisonStatus {
+  if (!task.estimated_minutes) return 'unknown';
+  const actual = (task.timer_minutes || 0) + (task.manual_minutes || 0);
+  const percentage = (actual / task.estimated_minutes) * 100;
+  
+  if (percentage < 80) return 'under';
+  if (percentage <= 100) return 'near';
+  return 'over';
+}
+
+export function formatMinutes(minutes: number): string {
+  const hours = Math.floor(minutes / 60);
+  const mins = minutes % 60;
+  if (hours === 0) return `${mins}m`;
+  if (mins === 0) return `${hours}h`;
+  return `${hours}h ${mins}m`;
+}
+
+export function formatSeconds(totalSeconds: number): string {
+  const hours = Math.floor(totalSeconds / 3600);
+  const minutes = Math.floor((totalSeconds % 3600) / 60);
+  const seconds = totalSeconds % 60;
+  
+  if (hours > 0) {
+    return `${hours}h ${minutes}m ${seconds}s`;
+  } else if (minutes > 0) {
+    return `${minutes}m ${seconds}s`;
+  } else {
+    return `${seconds}s`;
+  }
+}

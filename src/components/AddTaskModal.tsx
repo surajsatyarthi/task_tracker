@@ -22,11 +22,14 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onAdd, cur
     links: [] as string[],
     tags: [] as string[],
     due_date: '',
+    estimated_minutes: undefined as number | undefined,
   });
 
   const [linkInput, setLinkInput] = useState('');
   const [tagInput, setTagInput] = useState('');
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [estimateHours, setEstimateHours] = useState(0);
+  const [estimateMinutes, setEstimateMinutes] = useState(0);
 
   // Update project_id when currentProject or projects change
   useEffect(() => {
@@ -56,10 +59,13 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onAdd, cur
         links: [],
         tags: [],
         due_date: '',
+        estimated_minutes: undefined,
       });
       setLinkInput('');
       setTagInput('');
       setErrors({});
+      setEstimateHours(0);
+      setEstimateMinutes(0);
     }
   }, [isOpen, currentProject, projects]);
 
@@ -67,7 +73,9 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onAdd, cur
 
   const isValidURL = (url: string): boolean => {
     try {
-      new URL(url);
+      // If URL doesn't start with protocol, add https://
+      const urlToTest = url.match(/^https?:\/\//i) ? url : `https://${url}`;
+      new URL(urlToTest);
       return true;
     } catch {
       return false;
@@ -122,6 +130,10 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onAdd, cur
       links: formData.links.length > 0 ? formData.links : undefined,
       tags: formData.tags.length > 0 ? formData.tags : undefined,
       due_date: formData.due_date || undefined,
+      estimated_minutes: formData.estimated_minutes,
+      timer_minutes: 0,
+      manual_minutes: 0,
+      timer_running: false,
     };
     
     onAdd(newTask);
@@ -142,10 +154,13 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onAdd, cur
       links: [],
       tags: [],
       due_date: '',
+      estimated_minutes: undefined,
     });
     setLinkInput('');
     setTagInput('');
     setErrors({});
+    setEstimateHours(0);
+    setEstimateMinutes(0);
   };
 
   const addLink = () => {
@@ -255,7 +270,7 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onAdd, cur
               value={formData.title}
               onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
               maxLength={500}
-              className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder:text-gray-800 placeholder:font-medium ${
+              className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 ${
                 errors.title ? 'border-red-300' : 'border-gray-300'
               }`}
               placeholder="Enter task title..."
@@ -267,20 +282,75 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onAdd, cur
 
           {/* Project Selection */}
           <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">
+            <label htmlFor="task-project" className="block text-sm font-medium text-gray-700 mb-2">
               Project *
             </label>
             <select
+              id="task-project"
+              name="project"
+              aria-label="Select project for task"
               value={formData.project_id}
               onChange={(e) => setFormData(prev => ({ ...prev, project_id: e.target.value }))}
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 font-medium"
             >
-              {projects.filter(p => p.slug === 'personal' || p.slug === 'csuite').map((project) => (
+              {projects.map((project) => (
                 <option key={project.id} value={project.id}>
                   {project.name}
                 </option>
               ))}
             </select>
+          </div>
+
+          {/* Time Estimate */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Estimated Time <span className="text-gray-500 text-xs">(optional)</span>
+            </label>
+            <div className="flex gap-2">
+              <div className="flex-1">
+                <label className="block text-xs text-gray-500 mb-1">Hours</label>
+                <input
+                  type="number"
+                  min="0"
+                  max="999"
+                  value={estimateHours}
+                  onChange={(e) => {
+                    const hours = parseInt(e.target.value) || 0;
+                    setEstimateHours(hours);
+                    const totalMinutes = (hours * 60) + estimateMinutes;
+                    setFormData(prev => ({
+                      ...prev,
+                      estimated_minutes: totalMinutes > 0 ? totalMinutes : undefined
+                    }));
+                  }}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="0"
+                />
+              </div>
+              <div className="flex-1">
+                <label className="block text-xs text-gray-500 mb-1">Minutes</label>
+                <input
+                  type="number"
+                  min="0"
+                  max="59"
+                  value={estimateMinutes}
+                  onChange={(e) => {
+                    const mins = parseInt(e.target.value) || 0;
+                    setEstimateMinutes(mins);
+                    const totalMinutes = (estimateHours * 60) + mins;
+                    setFormData(prev => ({
+                      ...prev,
+                      estimated_minutes: totalMinutes > 0 ? totalMinutes : undefined
+                    }));
+                  }}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                  placeholder="0"
+                />
+              </div>
+            </div>
+            <p className="text-xs text-gray-500 mt-1">
+              💡 Parkinson's Law: Set realistic time limits to stay focused
+            </p>
           </div>
 
           {/* Description */}
@@ -293,7 +363,7 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onAdd, cur
               onChange={(e) => setFormData(prev => ({ ...prev, description: e.target.value }))}
               maxLength={5000}
               rows={3}
-              className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder:text-gray-800 placeholder:font-medium ${
+              className={`w-full px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 ${
                 errors.description ? 'border-red-300' : 'border-gray-300'
               }`}
               placeholder="Enter task description..."
@@ -315,10 +385,12 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onAdd, cur
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-2">
+              <label htmlFor="task-priority" className="block text-sm font-medium text-gray-700 mb-2">
                 Priority (Eisenhower Matrix)
               </label>
               <select
+                id="task-priority"
+                aria-label="Select task priority using Eisenhower Matrix"
                 value={formData.priority}
                 onChange={(e) => setFormData(prev => ({ ...prev, priority: e.target.value as TaskPriority }))}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 font-medium"
@@ -357,7 +429,7 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onAdd, cur
             </label>
             <div className="flex gap-2 mb-3">
               <input
-                type="url"
+                type="text"
                 value={linkInput}
                 onChange={(e) => {
                   setLinkInput(e.target.value);
@@ -367,14 +439,15 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onAdd, cur
                   });
                 }}
                 onKeyPress={(e) => handleKeyPress(e, addLink)}
-                className={`flex-1 px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder:text-gray-800 placeholder:font-medium ${
+                className={`flex-1 px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 ${
                   errors.linkInput ? 'border-red-300' : 'border-gray-300'
                 }`}
-                placeholder="https://example.com"
+                placeholder="https://example.com or www.example.com"
               />
               <button
                 type="button"
                 onClick={addLink}
+                aria-label="Add link to task"
                 className="px-3 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
               >
                 <PlusIcon className="w-5 h-5" />
@@ -394,6 +467,7 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onAdd, cur
                     <button
                       type="button"
                       onClick={() => removeLink(index)}
+                      aria-label={`Remove link ${link}`}
                       className="text-red-500 hover:text-red-700"
                     >
                       <XMarkIcon className="w-4 h-4" />
@@ -421,7 +495,7 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onAdd, cur
                   });
                 }}
                 onKeyPress={(e) => handleKeyPress(e, addTag)}
-                className={`flex-1 px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder:text-gray-800 placeholder:font-medium ${
+                className={`flex-1 px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 ${
                   errors.tagInput ? 'border-red-300' : 'border-gray-300'
                 }`}
                 placeholder="urgent, meeting, research"
@@ -429,6 +503,7 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onAdd, cur
               <button
                 type="button"
                 onClick={addTag}
+                aria-label="Add tag to task"
                 className="px-3 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition-colors"
               >
                 <PlusIcon className="w-5 h-5" />
@@ -451,6 +526,7 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onAdd, cur
                     <button
                       type="button"
                       onClick={() => removeTag(index)}
+                      aria-label={`Remove tag ${tag}`}
                       className="text-blue-600 hover:text-blue-800"
                     >
                       <XMarkIcon className="w-3 h-3" />
@@ -470,7 +546,7 @@ const AddTaskModal: React.FC<AddTaskModalProps> = ({ isOpen, onClose, onAdd, cur
               value={formData.remarks}
               onChange={(e) => setFormData(prev => ({ ...prev, remarks: e.target.value }))}
               rows={2}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder:text-gray-800 placeholder:font-medium"
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-900 resize-none"
               placeholder="Any additional notes or context..."
             />
           </div>

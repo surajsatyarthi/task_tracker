@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Task, statusConfig, isTaskOverdue, formatDateForDisplay, getDaysUntilDue } from '@/types/task';
+import { Task, statusConfig, isTaskOverdue, formatDateForDisplay, getDaysUntilDue, formatMinutes } from '@/types/task';
 import { CalendarIcon, UserIcon, LinkIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline';
 
 interface TaskCardProps {
@@ -37,8 +37,8 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, isDragging = false, onClick, 
   return (
     <div
       className={`
-        bg-white rounded-lg border p-4 cursor-pointer hover:shadow-lg transition-all duration-200 relative min-h-[44px]
-        ${isDragging ? 'shadow-2xl border-blue-300' : 'hover:border-gray-300'}
+        bg-white rounded-lg border p-4 cursor-pointer hover:shadow-lg transition-all duration-200 ease-in-out transform hover:scale-[1.01] relative min-h-[44px] animate-fadeIn
+        ${isDragging ? 'shadow-2xl border-blue-300 scale-105 rotate-1' : 'hover:border-gray-300'}
         ${isOverdue ? 'border-red-300 bg-red-50 shadow-red-100 shadow-md' : 'border-gray-200'}
       `}
       onClick={onClick}
@@ -90,6 +90,22 @@ const TaskCard: React.FC<TaskCardProps> = ({ task, isDragging = false, onClick, 
 
       {/* Task Metadata */}
       <div className="flex flex-wrap gap-2 text-xs text-gray-500">
+        {/* Timer Badge - Only show when doing and timer running */}
+        {task.status === 'doing' && task.timer_running && (
+          <div className="flex items-center gap-1 text-red-500 font-semibold">
+            <span className="animate-pulse">●</span>
+            <span>Timer active</span>
+          </div>
+        )}
+        
+        {/* Time Estimate Badge */}
+        {task.estimated_minutes && (
+          <div className="flex items-center gap-1 text-blue-600">
+            <span>⏱️</span>
+            <span>{formatMinutes(task.estimated_minutes)} est.</span>
+          </div>
+        )}
+        
         {task.owner && (
           <div className="flex items-center gap-1">
             <UserIcon className="w-3 h-3" />

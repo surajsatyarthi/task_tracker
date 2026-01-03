@@ -17,7 +17,7 @@ interface User {
 interface AuthContextType {
   user: User | null;
   loading: boolean;
-  signIn: (email: string, password: string) => Promise<void>;
+  signIn: (email: string, password: string, rememberMe?: boolean) => Promise<void>;
   signUp: (email: string, password: string) => Promise<void>;
   signOut: () => Promise<void>;
   isAuthenticated: boolean;
@@ -73,7 +73,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     return () => subscription.unsubscribe();
   }, []);
 
-  const signIn = async (email: string, password: string) => {
+  const signIn = async (email: string, password: string, rememberMe: boolean = false) => {
     setLoading(true);
     try {
       const { data, error } = await supabase.auth.signInWithPassword({
@@ -86,6 +86,18 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       // Check if email is verified
       if (data.user && !data.user.email_confirmed_at) {
         throw new Error('Please verify your email before signing in. Check your inbox for the verification link.');
+      }
+      
+      // Store preference for session persistence
+      // Note: Supabase already uses localStorage, but we document the choice
+      try {
+        if (rememberMe) {
+          localStorage.setItem('supabase.auth.rememberMe', 'true');
+        } else {
+          localStorage.setItem('supabase.auth.rememberMe', 'false');
+        }
+      } catch (error) {
+        console.warn('Failed to store session preference:', error);
       }
       
       setUser(data.user ? {

@@ -9,6 +9,7 @@ export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [rememberMe, setRememberMe] = useState(false);
   const [error, setError] = useState('');
 
   useEffect(() => {
@@ -20,6 +21,18 @@ export default function LoginPage() {
     if (err) {
       setError(decodeURIComponent(desc || 'Authentication error'));
     }
+    
+    // Load remembered email if exists
+    try {
+      const rememberedEmail = localStorage.getItem('rememberedEmail');
+      if (rememberedEmail) {
+        setEmail(rememberedEmail);
+        setRememberMe(true);
+      }
+    } catch (error) {
+      // Silently fail if localStorage unavailable (private browsing)
+      console.warn('localStorage not available:', error);
+    }
   }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -27,7 +40,19 @@ export default function LoginPage() {
     setError('');
 
     try {
-      await signIn(email, password);
+      // Save or clear email preference
+      try {
+        if (rememberMe) {
+          localStorage.setItem('rememberedEmail', email);
+        } else {
+          localStorage.removeItem('rememberedEmail');
+        }
+      } catch (error) {
+        // Continue even if localStorage fails
+        console.warn('Failed to save email preference:', error);
+      }
+      
+      await signIn(email, password, rememberMe);
       router.push('/');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'An error occurred');
@@ -100,6 +125,20 @@ export default function LoginPage() {
                 onChange={(e) => setPassword(e.target.value)}
               />
             </div>
+          </div>
+
+          <div className="flex items-center">
+            <input
+              id="remember-me"
+              name="remember-me"
+              type="checkbox"
+              checked={rememberMe}
+              onChange={(e) => setRememberMe(e.target.checked)}
+              className="h-4 w-4 text-indigo-600 focus:ring-indigo-500 border-gray-300 rounded cursor-pointer"
+            />
+            <label htmlFor="remember-me" className="ml-2 block text-sm text-gray-900 cursor-pointer">
+              Remember me
+            </label>
           </div>
 
           <div>

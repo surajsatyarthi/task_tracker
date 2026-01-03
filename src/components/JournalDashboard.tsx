@@ -28,13 +28,13 @@ const JournalDashboard: React.FC<JournalDashboardProps> = ({ onEntryUpdate }) =>
   const [todayEntry, setTodayEntry] = useState<DailyJournalEntry | null>(null);
 
   useEffect(() => {
-    // Initialize with empty entries - journaling starts from October 17, 2025
+    // Initialize with empty entries - journaling starts from January 1, 2026
     const sampleEntries: DailyJournalEntry[] = [];
     
     setEntries(sampleEntries);
     
     // Create or get today's entry (starting from Oct 17, 2025)
-    const startDate = new Date('2025-10-17');
+    const startDate = new Date('2026-01-01');
     const currentDate = new Date();
     
     // Only create entry if current date is Oct 17 or later
@@ -56,7 +56,7 @@ const JournalDashboard: React.FC<JournalDashboardProps> = ({ onEntryUpdate }) =>
       }
     } else {
       // Before Oct 17, show empty state for tomorrow
-      const tomorrow = '2025-10-17';
+      const tomorrow = '2026-01-01';
       const newEntry: DailyJournalEntry = {
         id: 'entry-tomorrow',
         ...createEmptyEntry(tomorrow),

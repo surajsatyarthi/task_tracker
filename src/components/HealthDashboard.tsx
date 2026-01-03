@@ -185,7 +185,7 @@ const HealthDashboard: React.FC<HealthDashboardProps> = ({ onWorkoutUpdate }) =>
   const workoutStreak = getWorkoutStreak(workoutWeeks);
   const currentMonth = new Date().toISOString().substring(0, 7);
   const monthlyStats = calculateMonthlyStats(workoutWeeks, currentMonth);
-  const yearlyStats = calculateYearlyStats(workoutWeeks, 2025);
+  const yearlyStats = calculateYearlyStats(workoutWeeks, 2026);
   
   const todayWeight = dailyWeights.find(w => w.date === new Date().toISOString().split('T')[0]);
   const latestWeight = dailyWeights[0];
@@ -201,7 +201,7 @@ const HealthDashboard: React.FC<HealthDashboardProps> = ({ onWorkoutUpdate }) =>
       {/* Header */}
       <div className="text-center">
         <h2 className="text-3xl font-bold text-gray-900 mb-2">Health & Fitness Dashboard</h2>
-        <p className="text-gray-600">Your fitness journey begins October 17, 2025 (Friday) - Ready to transform?</p>
+        <p className="text-gray-600">Your fitness journey begins January 1, 2026 (Wednesday) - Ready to transform?</p>
       </div>
 
       {/* Navigation Tabs */}
@@ -571,7 +571,7 @@ const HealthDashboard: React.FC<HealthDashboardProps> = ({ onWorkoutUpdate }) =>
           <div className="bg-white rounded-xl p-6 border border-gray-200">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold text-gray-900">
-                Weight History - Starting October 17, 2025
+                Weight History - Starting January 1, 2026
               </h3>
               <div className="text-sm text-gray-600 bg-blue-50 px-3 py-1 rounded-full">
                 {dailyWeights.length} daily records
@@ -617,7 +617,7 @@ const HealthDashboard: React.FC<HealthDashboardProps> = ({ onWorkoutUpdate }) =>
                 <ScaleIcon className="w-16 h-16 mx-auto text-gray-300 mb-4" />
                 <h4 className="text-lg font-medium text-gray-900 mb-2">Ready to Start Your Journey?</h4>
                 <p className="text-gray-600 mb-4">
-                  Your fitness tracking begins October 17, 2025 (Friday)<br/>
+                  Your fitness tracking begins January 1, 2026 (Wednesday)<br/>
                   Record your daily weight above to see progress charts and statistics.
                 </p>
                 <div className="text-sm text-blue-600 bg-blue-50 px-4 py-2 rounded-lg inline-block">
@@ -869,7 +869,7 @@ const HealthDashboard: React.FC<HealthDashboardProps> = ({ onWorkoutUpdate }) =>
 
           {/* Yearly Stats */}
           <div className="bg-white rounded-xl p-6 border border-gray-200">
-            <h3 className="text-lg font-semibold text-gray-900 mb-4">2025-26 Fitness Year Progress</h3>
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">2026 Fitness Year Progress</h3>
             
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
               <div className="text-center">

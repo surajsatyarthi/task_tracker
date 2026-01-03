@@ -409,11 +409,11 @@ export const WORKOUT_PLAN: WorkoutTemplate[] = [
   },
 ];
 
-// Generate workout weeks starting from Oct 17, 2025 (Friday)
+// Generate workout weeks for calendar year 2026
 export const generateWorkoutWeeks = (): WorkoutWeek[] => {
   const weeks: WorkoutWeek[] = [];
-  const startDate = new Date('2025-10-17'); // First workout day (Friday)
-  const endDate = new Date('2026-10-16'); // End date (1 year from start)
+  const startDate = new Date('2026-01-01'); // First workout day (Wednesday)
+  const endDate = new Date('2026-12-31'); // End date (full calendar year)
   const totalDays = Math.ceil((endDate.getTime() - startDate.getTime()) / (1000 * 60 * 60 * 24)) + 1; // +1 to include end date
   
   // Calculate which day of the week Oct 17 falls on (0=Sunday, 1=Monday, etc.)
@@ -530,8 +530,8 @@ export const calculateMonthlyStats = (workoutWeeks: WorkoutWeek[], month: string
   const monthWorkouts = workoutWeeks.flatMap(week => 
     week.days.filter(day => {
       const dayDate = new Date(day.date);
-      const startDate = new Date('2025-10-17');
-      const endDate = new Date('2026-10-16');
+      const startDate = new Date('2026-01-01');
+      const endDate = new Date('2026-12-31');
       return day.date.startsWith(month) && dayDate >= startDate && dayDate <= endDate;
     })
   );
@@ -541,7 +541,7 @@ export const calculateMonthlyStats = (workoutWeeks: WorkoutWeek[], month: string
   const missedWorkouts = monthWorkouts.filter(day => {
     const dayDate = new Date(day.date);
     const today = new Date();
-    const startDate = new Date('2025-10-17');
+    const startDate = new Date('2026-01-01');
     // Only count as missed if the date is past today AND after the start date
     return dayDate < today && dayDate >= startDate && !day.completed;
   }).length;
@@ -556,12 +556,12 @@ export const calculateMonthlyStats = (workoutWeeks: WorkoutWeek[], month: string
 };
 
 export const calculateYearlyStats = (workoutWeeks: WorkoutWeek[], year: number): YearlyStats => {
-  // For our fitness year (Oct 2025 - Oct 2026), include both years
+  // For our fitness year (2026 calendar year)
   const yearWorkouts = workoutWeeks.flatMap(week => 
     week.days.filter(day => {
       const dayDate = new Date(day.date);
-      const startDate = new Date('2025-10-17');
-      const endDate = new Date('2026-10-16');
+      const startDate = new Date('2026-01-01');
+      const endDate = new Date('2026-12-31');
       return dayDate >= startDate && dayDate <= endDate;
     })
   );
@@ -571,7 +571,7 @@ export const calculateYearlyStats = (workoutWeeks: WorkoutWeek[], year: number):
   const missedWorkouts = yearWorkouts.filter(day => {
     const dayDate = new Date(day.date);
     const today = new Date();
-    const startDate = new Date('2025-10-17');
+    const startDate = new Date('2026-01-01');
     // Only count as missed if the date is past today AND after the start date
     return dayDate < today && dayDate >= startDate && !day.completed;
   }).length;

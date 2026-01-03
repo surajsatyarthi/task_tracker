@@ -4,6 +4,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import EisenhowerMatrix from '@/components/EisenhowerMatrix';
 import TaskTable from '@/components/TaskTable';
 import CalendarView from '@/components/CalendarView';
+import StatusBoard from '@/components/StatusBoard';
 import TaskDetailModal from '@/components/TaskDetailModal';
 import AddTaskModal from '@/components/AddTaskModal';
 import HealthDashboard from '@/components/HealthDashboard';
@@ -11,16 +12,17 @@ import JournalDashboard from '@/components/JournalDashboard';
 import { useAuth, supabase } from '@/contexts/AuthContext';
 import { useRouter } from 'next/navigation';
 import { Task, TaskStatus, TaskPriority, Project } from '@/types/task';
-import { Squares2X2Icon, TableCellsIcon, CalendarIcon } from '@heroicons/react/24/outline';
-import { LoadingSpinner, LoadingSkeleton } from '@/components/LoadingStates';
+import { Squares2X2Icon, TableCellsIcon, CalendarIcon, ViewColumnsIcon } from '@heroicons/react/24/outline';
+import { LoadingSpinner, SkeletonLoader } from '@/components/LoadingSpinner';
 
 export default function TaskTracker() {
   const { user, signOut } = useAuth();
   const [tasks, setTasks] = useState<Task[]>([]);
   const [projects, setProjects] = useState<Project[]>([]);
   const [activeProject, setActiveProject] = useState<string>('personal');
-  const [viewMode, setViewMode] = useState<'matrix' | 'table' | 'calendar'>('matrix');
+  const [viewMode, setViewMode] = useState<'matrix' | 'table' | 'calendar' | 'status'>('matrix');
   const [selectedTask, setSelectedTask] = useState<Task | null>(null);
+  const [isEditMode, setIsEditMode] = useState(false);
   const [showAddModal, setShowAddModal] = useState(false);
   const [loading, setLoading] = useState(true);
   const [operationLoading, setOperationLoading] = useState(false);
@@ -174,36 +176,44 @@ export default function TaskTracker() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeProject, projects.length]);
 
-  const handleTaskUpdateById = (taskId: string, updates: Partial<Task>) => {
+  const handleTaskUpdateById = async (taskId: string, updates: Partial<Task>) => {
     const task = tasks.find(t => t.id === taskId);
-    if (!task) return;
+    if (!task || operationLoading) return;
     
+    // Optimistic update - update UI immediately
     const updatedTask = { ...task, ...updates };
-    handleTaskUpdate(updatedTask);
-  };
-
-  const handleTaskUpdate = async (updatedTask: Task) => {
-    if (operationLoading) return;
+    setTasks(prevTasks => prevTasks.map(t => t.id === taskId ? updatedTask : t));
+    
+    // Update selected task in modal if it's open
+    if (selectedTask && selectedTask.id === taskId) {
+      setSelectedTask(updatedTask);
+    }
+    
+    // Send only the changed fields to API
     try {
       setOperationLoading(true);
       const token = await supabase.auth.getSession();
-      const response = await fetch(`/api/tasks/${updatedTask.id}`, {
+      const response = await fetch(`/api/tasks/${taskId}`, {
         method: 'PUT',
         headers: { 
           'Content-Type': 'application/json',
           'Authorization': `Bearer ${token.data.session?.access_token}`,
         },
-        body: JSON.stringify(updatedTask),
+        body: JSON.stringify(updates), // Send only updates
       });
       
       if (!response.ok) {
         const errorData = await response.json();
         console.error('Update error:', errorData);
+        // Rollback optimistic update on error
+        setTasks(prevTasks => prevTasks.map(t => t.id === taskId ? task : t));
+        if (selectedTask && selectedTask.id === taskId) {
+          setSelectedTask(task);
+        }
         throw new Error(errorData.error || 'Failed to update task');
       }
       
-      // Refresh both tasks and project counts
-      await Promise.all([fetchTasks(), fetchProjects()]);
+      // Success - optimistic update is already applied, no need to reload
     } catch (error) {
       console.error('Error updating task:', error);
       setError(error instanceof Error ? error.message : 'Failed to update task');
@@ -212,28 +222,51 @@ export default function TaskTracker() {
     }
   };
 
+
   const handleTaskCreate = async (newTask: Omit<Task, 'id' | 'created_at' | 'updated_at'>) => {
     if (operationLoading) return;
     try {
       setOperationLoading(true);
+      setError(null);
+      
       const token = await supabase.auth.getSession();
+      
+      if (!token.data.session?.access_token) {
+        throw new Error('Not authenticated. Please log in again.');
+      }
+      
+      console.log('[handleTaskCreate] Creating task:', { title: newTask.title, project_id: newTask.project_id });
+      
       const response = await fetch('/api/tasks', {
         method: 'POST',
         headers: { 
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token.data.session?.access_token}`,
+          'Authorization': `Bearer ${token.data.session.access_token}`,
         },
         body: JSON.stringify(newTask),
       });
       
-      if (!response.ok) throw new Error('Failed to create task');
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ error: 'Failed to create task' }));
+        const errorMessage = errorData.error || 'Failed to create task';
+        const errorDetails = errorData.details ? ` (${errorData.details})` : '';
+        console.error('[handleTaskCreate] API error:', errorData);
+        throw new Error(`${errorMessage}${errorDetails}`);
+      }
 
-      // Refresh both tasks and project counts
-      await Promise.all([fetchTasks(), fetchProjects()]);
+      const result = await response.json();
+      console.log('[handleTaskCreate] Task created successfully:', result.task?.id);
+      
+      // Add new task to UI optimistically
+      if (result.task) {
+        setTasks(prevTasks => [result.task, ...prevTasks]);
+      }
       setShowAddModal(false);
     } catch (error) {
-      console.error('Error creating task:', error);
-      setError('Failed to create task');
+      console.error('[handleTaskCreate] Error:', error);
+      const errorMessage = error instanceof Error ? error.message : 'Failed to create task';
+      setError(errorMessage);
+      alert(`Error creating task: ${errorMessage}`);
     } finally {
       setOperationLoading(false);
     }
@@ -243,6 +276,14 @@ export default function TaskTracker() {
     if (operationLoading) return;
     try {
       setOperationLoading(true);
+      
+      // Optimistically remove task from UI
+      const taskToDelete = tasks.find(t => t.id === taskId);
+      setTasks(prevTasks => prevTasks.filter(t => t.id !== taskId));
+      if (selectedTask?.id === taskId) {
+        setSelectedTask(null);
+      }
+      
       const token = await supabase.auth.getSession();
       const response = await fetch(`/api/tasks/${taskId}`, {
         method: 'DELETE',
@@ -251,10 +292,13 @@ export default function TaskTracker() {
         },
       });
       
-      if (!response.ok) throw new Error('Failed to delete task');
-      
-      // Refresh tasks
-      await Promise.all([fetchTasks(), fetchProjects()]);
+      if (!response.ok) {
+        // Rollback on error
+        if (taskToDelete) {
+          setTasks(prevTasks => [...prevTasks, taskToDelete]);
+        }
+        throw new Error('Failed to delete task');
+      }
     } catch (error) {
       console.error('Error deleting task:', error);
       setError('Failed to delete task');
@@ -334,6 +378,18 @@ export default function TaskTracker() {
     }
   };
 
+  // Handler to open task in view mode
+  const handleTaskView = (task: Task) => {
+    setSelectedTask(task);
+    setIsEditMode(false);
+  };
+
+  // Handler to open task in edit mode
+  const handleTaskEdit = (task: Task) => {
+    setSelectedTask(task);
+    setIsEditMode(true);
+  };
+
   const currentProject = projects.find(p => p.slug === activeProject);
 
   // Filter tasks by search query only (project filtering happens at API level)
@@ -361,16 +417,15 @@ export default function TaskTracker() {
         {/* Header */}
         <div className="bg-white shadow-sm border-b">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center justify-between h-16">
-              <h1 className="text-2xl font-bold text-gray-900">Task Tracker Pro</h1>
-              <LoadingSpinner size="sm" text="" />
+            <div className="flex items-center justify-center h-16">
+              <LoadingSpinner size="sm" text="Loading tasks..." />
             </div>
           </div>
         </div>
         
         {/* Loading Content */}
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <LoadingSkeleton type={viewMode} count={6} />
+          <SkeletonLoader count={6} />
         </div>
       </div>
     );
@@ -560,6 +615,18 @@ export default function TaskTracker() {
                   <CalendarIcon className="w-4 h-4 sm:mr-2" />
                   <span className="hidden sm:inline">Calendar</span>
                 </button>
+                <button
+                  type="button"
+                  onClick={() => setViewMode('status')}
+                  className={`flex items-center justify-center px-3 py-2 rounded-md text-sm font-medium min-h-[44px] sm:min-h-0 ${
+                    viewMode === 'status'
+                      ? 'bg-indigo-100 text-indigo-700'
+                      : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+                  }`}
+                >
+                  <ViewColumnsIcon className="w-4 h-4 sm:mr-2" />
+                  <span className="hidden sm:inline">Status</span>
+                </button>
               </div>
               <div className="text-xs sm:text-sm text-gray-500 text-center sm:text-right">
                 {searchQuery ? (
@@ -585,7 +652,7 @@ export default function TaskTracker() {
       )}
 
       {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 transition-opacity duration-200">
         {showSpecialDashboard ? (
           renderDashboard()
         ) : (
@@ -601,15 +668,23 @@ export default function TaskTracker() {
             {viewMode === 'table' && (
               <TaskTable
                 tasks={filteredTasks}
-                onTaskClick={setSelectedTask}
+                onTaskClick={handleTaskView}
+                onTaskEdit={handleTaskEdit}
                 highlight={searchQuery}
-
               />
             )}
             {viewMode === 'calendar' && (
               <CalendarView
                 tasks={filteredTasks}
+                onTaskClick={handleTaskView}
+                highlight={searchQuery}
+              />
+            )}
+            {viewMode === 'status' && (
+              <StatusBoard
+                tasks={filteredTasks}
                 onTaskClick={setSelectedTask}
+                onTaskMove={handleStatusChange}
                 highlight={searchQuery}
               />
             )}
@@ -622,8 +697,13 @@ export default function TaskTracker() {
         <TaskDetailModal
           task={selectedTask}
           isOpen={!!selectedTask}
-          onClose={() => setSelectedTask(null)}
+          onClose={() => {
+            setSelectedTask(null);
+            setIsEditMode(false);
+          }}
           onUpdate={handleTaskUpdateById}
+          onDelete={handleTaskDelete}
+          initialEditMode={isEditMode}
         />
       )}
 

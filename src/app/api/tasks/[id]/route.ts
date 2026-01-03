@@ -42,6 +42,10 @@ export async function PUT(
     if (body.owner !== undefined) updateData.owner = body.owner;
     if (body.department !== undefined) updateData.department = body.department;
     
+    // Handle time tracking fields
+    if (body.estimated_minutes !== undefined) updateData.estimated_minutes = body.estimated_minutes;
+    if (body.manual_minutes !== undefined) updateData.manual_minutes = body.manual_minutes;
+    
     // Handle priority and flags
     if (body.priority !== undefined) {
       updateData.priority = body.priority;
