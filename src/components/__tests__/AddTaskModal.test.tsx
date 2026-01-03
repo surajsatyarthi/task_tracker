@@ -7,8 +7,8 @@ import { Project } from '@/types/task';
 
 describe('AddTaskModal - Form Validation', () => {
   const mockProjects: Project[] = [
-    { id: 'proj-1', name: 'Personal', slug: 'personal', user_id: 'user-1', created_at: '', updated_at: '' },
-    { id: 'proj-2', name: 'Work', slug: 'work', user_id: 'user-1', created_at: '', updated_at: '' },
+    { id: 'proj-1', name: 'Personal', slug: 'personal', user_id: 'user-1', color: '#3b82f6', is_active: true, created_at: '', updated_at: '' },
+    { id: 'proj-2', name: 'Work', slug: 'work', user_id: 'user-1', color: '#8b5cf6', is_active: true, created_at: '', updated_at: '' },
   ];
 
   const mockOnClose = vi.fn();

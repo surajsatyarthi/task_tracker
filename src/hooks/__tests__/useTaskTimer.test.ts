@@ -31,11 +31,16 @@ describe('useTaskTimer', () => {
 
   const mockTask: Task = {
     id: 'test-task-1',
+    project_id: 'proj-1',
     title: 'Test Task',
     user_id: 'user-1',
     status: 'doing',
+    priority: 'urgent_important',
+    is_urgent: true,
+    is_important: true,
     estimated_minutes: 60,
     timer_minutes: 0,
+    manual_minutes: 0,
     timer_running: false,
     timer_started_at: undefined,
     created_at: new Date().toISOString(),
