@@ -17,7 +17,9 @@
     "test:coverage": "vitest --coverage",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
-    "check-migration": "node -e \"const {createClient}=require('@supabase/supabase-js');const s=createClient(process.env.NEXT_PUBLIC_SUPABASE_URL,process.env.SUPABASE_SERVICE_ROLE_KEY);s.from('tasks').select('*').limit(1).then(({data})=>{const r=data[0]||{};console.log('estimated_minutes' in r?'✅ Migration applied':'❌ Migration needed - see TIMER_TESTING_REPORT.md');})\""
+    "check-migration": "node -e \"const {createClient}=require('@supabase/supabase-js');const s=createClient(process.env.NEXT_PUBLIC_SUPABASE_URL,process.env.SUPABASE_SERVICE_ROLE_KEY);s.from('tasks').select('*').limit(1).then(({data})=>{const r=data[0]||{};console.log('estimated_minutes' in r?'✅ Migration applied':'❌ Migration needed - see TIMER_TESTING_REPORT.md');})\"",
+    "deploy:verify": "bash scripts/verify-full-deployment.sh",
+    "deploy": "git push && npm run deploy:verify"
   },
   "dependencies": {
     "@headlessui/react": "^2.2.9",
