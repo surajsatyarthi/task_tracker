@@ -9,6 +9,7 @@ export type TaskPriority =
 export interface Task {
   id: string;
   project_id: string;
+  user_id?: string;
   title: string;
   description?: string;
   status: TaskStatus;
@@ -48,6 +49,7 @@ export interface Task {
 
 export interface Project {
   id: string;
+  user_id?: string;
   name: string;
   slug: string;
   description?: string;

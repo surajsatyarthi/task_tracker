@@ -3,6 +3,8 @@ import { renderHook, act, waitFor } from '@testing-library/react';
 import { useTaskTimer } from '@/hooks/useTaskTimer';
 import { Task } from '@/types/task';
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 // Mock fetch
 global.fetch = vi.fn();
 
@@ -35,7 +37,7 @@ describe('useTaskTimer', () => {
     estimated_minutes: 60,
     timer_minutes: 0,
     timer_running: false,
-    timer_started_at: null,
+    timer_started_at: undefined,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString(),
   };
@@ -51,6 +53,7 @@ describe('useTaskTimer', () => {
   });
 
   it('starts timer and increments seconds', async () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (global.fetch as any).mockResolvedValueOnce({ ok: true });
 
     const { result } = renderHook(() => useTaskTimer(mockTask));

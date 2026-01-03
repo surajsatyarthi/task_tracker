@@ -6,8 +6,11 @@ import EisenhowerMatrix from '@/components/EisenhowerMatrix';
 import StatusBoard from '@/components/StatusBoard';
 import { DragDropContext, Droppable, Draggable, DropResult } from '@hello-pangea/dnd';
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
+
 // Mock TaskCard component
 vi.mock('@/components/TaskCard', () => ({
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   default: ({ task, onClick, isDragging }: any) => (
     <div
       data-testid={`task-card-${task.id}`}
