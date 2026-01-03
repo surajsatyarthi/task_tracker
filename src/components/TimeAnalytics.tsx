@@ -31,57 +31,12 @@ interface TimeAnalyticsProps {
 
 type DateRange = '7' | '30' | '90' | 'all';
 
-// Generate dummy data for demo purposes
-const generateDummyTasks = (projects: Project[]): Task[] => {
-  const now = new Date();
-  const dummyTasks: Task[] = [];
-  const priorities: Array<'urgent_important' | 'urgent_not_important' | 'not_urgent_important' | 'not_urgent_not_important'> = 
-    ['urgent_important', 'urgent_not_important', 'not_urgent_important', 'not_urgent_not_important'];
-  
-  for (let i = 0; i < 20; i++) {
-    const daysAgo = Math.floor(Math.random() * 30);
-    const date = new Date(now);
-    date.setDate(date.getDate() - daysAgo);
-    
-    const estimated = Math.floor(Math.random() * 180) + 30; // 30-210 minutes
-    const variance = (Math.random() - 0.3) * 0.8; // -30% to +50%
-    const actual = Math.floor(estimated * (1 + variance));
-    
-    dummyTasks.push({
-      id: `dummy-${i}`,
-      title: `Task ${i + 1}: ${['Design mockups', 'Code review', 'Write documentation', 'Team meeting', 'Bug fixes', 'Feature development'][i % 6]}`,
-      status: Math.random() > 0.3 ? 'done' : 'in_progress',
-      priority: priorities[i % 4],
-      project_id: projects[i % Math.min(projects.length, 2)]?.id || 'p1',
-      user_id: 'demo-user',
-      timer_minutes: Math.floor(actual * 0.7),
-      manual_minutes: Math.floor(actual * 0.3),
-      estimated_minutes: estimated,
-      created_at: date.toISOString(),
-      updated_at: date.toISOString()
-    });
-  }
-  
-  return dummyTasks;
-};
-
 const TimeAnalytics: React.FC<TimeAnalyticsProps> = ({ tasks, projects }) => {
   const [dateRange, setDateRange] = useState<DateRange>('30');
   const [selectedProject, setSelectedProject] = useState<string>('all');
-  const [useDummyData, setUseDummyData] = useState(false);
-
-  // Use dummy data ONLY in development and ONLY if explicitly enabled
-  const effectiveTasks = useMemo(() => {
-    const isDevelopment = process.env.NODE_ENV === 'development';
-    if (isDevelopment && useDummyData) {
-      return generateDummyTasks(projects);
-    }
-    return tasks;
-  }, [tasks, projects, useDummyData]);
 
   // Filter tasks by date range and project
   const filteredTasks = useMemo(() => {
-    let filtered = effectiveTasks;
     let filtered = tasks;
 
     // Filter by project
@@ -102,7 +57,7 @@ const TimeAnalytics: React.FC<TimeAnalyticsProps> = ({ tasks, projects }) => {
     }
 
     return filtered;
-  }, [effectiveTasks, dateRange, selectedProject]);
+  }, [tasks, dateRange, selectedProject]);
 
   const stats = useMemo(() => calculateOverallStats(filteredTasks), [filteredTasks]);
   const dailyData = useMemo(() => groupTasksByDate(filteredTasks, parseInt(dateRange === 'all' ? '90' : dateRange)), [filteredTasks, dateRange]);
@@ -111,8 +66,6 @@ const TimeAnalytics: React.FC<TimeAnalyticsProps> = ({ tasks, projects }) => {
   const overtimeTasks = useMemo(() => getTopOvertimeTasks(filteredTasks, 10), [filteredTasks]);
 
   const hasData = stats.totalMinutes > 0;
-  const hasRealData = tasks.some(t => (t.timer_minutes || 0) + (t.manual_minutes || 0) > 0);
-  const isDevelopment = process.env.NODE_ENV === 'development';
 
   if (!hasData) {
     return (
@@ -142,20 +95,9 @@ const TimeAnalytics: React.FC<TimeAnalyticsProps> = ({ tasks, projects }) => {
       <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
         <div>
           <h2 className="text-2xl font-bold text-gray-900">Time Analytics</h2>
-          <p className="text-sm text-gray-600">
-            {useDummyData && '🎨 Demo Data - '}Track where your time goes and improve your estimates
-          </p>
+          <p className="text-sm text-gray-600">Track where your time goes and improve your estimates</p>
         </div>
         <div className="flex flex-col sm:flex-row gap-3">
-          {/* Demo Data Toggle - ONLY in development */}
-          {isDevelopment && (
-            <button
-              onClick={() => setUseDummyData(!useDummyData)}
-              className="px-4 py-2 border border-gray-300 rounded-md text-sm bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-blue-500"
-            >
-              {useDummyData ? '📊 Show Real Data' : '🎨 Show Demo Data'}
-            </button>
-          )}
           {/* Project Filter */}
           <select
             value={selectedProject}
