@@ -593,6 +593,18 @@ export default function TaskTracker() {
                 </button>
                 <button
                   type="button"
+                  onClick={() => setViewMode('status')}
+                  className={`flex items-center justify-center px-3 py-2 rounded-md text-sm font-medium min-h-[44px] sm:min-h-0 ${
+                    viewMode === 'status'
+                      ? 'bg-indigo-100 text-indigo-700'
+                      : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
+                  }`}
+                >
+                  <ViewColumnsIcon className="w-4 h-4 sm:mr-2" />
+                  <span className="hidden sm:inline">Status</span>
+                </button>
+                <button
+                  type="button"
                   onClick={() => setViewMode('table')}
                   className={`flex items-center justify-center px-3 py-2 rounded-md text-sm font-medium min-h-[44px] sm:min-h-0 ${
                     viewMode === 'table'
@@ -614,18 +626,6 @@ export default function TaskTracker() {
                 >
                   <CalendarIcon className="w-4 h-4 sm:mr-2" />
                   <span className="hidden sm:inline">Calendar</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setViewMode('status')}
-                  className={`flex items-center justify-center px-3 py-2 rounded-md text-sm font-medium min-h-[44px] sm:min-h-0 ${
-                    viewMode === 'status'
-                      ? 'bg-indigo-100 text-indigo-700'
-                      : 'text-gray-500 hover:text-gray-700 hover:bg-gray-50'
-                  }`}
-                >
-                  <ViewColumnsIcon className="w-4 h-4 sm:mr-2" />
-                  <span className="hidden sm:inline">Status</span>
                 </button>
               </div>
               <div className="text-xs sm:text-sm text-gray-500 text-center sm:text-right">
