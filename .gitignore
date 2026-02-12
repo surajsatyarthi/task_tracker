@@ -39,3 +39,7 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Protocol sync (synced from GitHub)
+/.agent
+/.protocol-cache
