@@ -1,0 +1,14 @@
+{
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash /Users/user/Desktop/task-tracker/.claude/hooks/update-grok-brain.sh"
+          }
+        ]
+      }
+    ]
+  }
+}
